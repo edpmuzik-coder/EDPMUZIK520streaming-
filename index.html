@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDPMUZIK520streaming</title>
+    <!-- Script obrigatório para o sistema de login funcionar -->
     </script>
     <style>
         body { background-color: #09090b; color: #ededed; font-family: sans-serif; padding: 20px; text-align: center; }
         header { border-bottom: 1px solid #27272a; padding-bottom: 15px; margin-bottom: 20px; }
         header h1 { color: #e11d48; margin: 0; font-size: 22px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 15px; }
+        .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 15px; text-align: left; }
         audio { width: 100%; margin-top: 10px; }
+        .admin-btn { background: #27272a; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; display: inline-block; margin-top: 12px; border: 1px solid #3f3f46; font-weight: bold; transition: 0.2s; }
+        .admin-btn:hover { background: #3f3f46; }
     </style>
 </head>
 <body>
@@ -19,6 +22,8 @@
     <header>
         <h1>🍿 EDPMUZIK520streaming</h1>
         <p>Músicas enviadas pelo telefone</p>
+        <!-- Atalho direto para o painel de controlo -->
+        <a href="/admin/" class="admin-btn">🔑 Entrar como Admin</a>
     </header>
 
     <div class="grid" id="lista-musicas">
@@ -26,12 +31,16 @@
     </div>
 
     <script>
-        // Script simples para carregar os arquivos enviados pelo painel de administração
+        // Carrega automaticamente os ficheiros guardados pelo painel
         fetch('/conteudo/musicas.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error("Sem músicas cadastradas.");
+                return response.json();
+            })
             .then(data => {
                 const lista = document.getElementById('lista-musicas');
-                data.forEach(musica => {
+                const musicas = Array.isArray(data) ? data : [data];
+                musicas.forEach(musica => {
                     lista.innerHTML += `
                         <div class="card">
                             <h3>${musica.titulo}</h3>
@@ -40,8 +49,10 @@
                         </div>
                     `;
                 });
-            }).catch(err => console.log("Ainda não há músicas cadastradas."));
+            })
+            .catch(err => {
+                document.getElementById('lista-musicas').innerHTML = `<p style="color: #a1a1aa; grid-column: 1/-1;">Nenhuma música publicada ainda. Utilize o botão acima para entrar no painel e carregar o seu primeiro .mp3!</p>`;
+            });
     </script>
 </body>
 </html>
-
