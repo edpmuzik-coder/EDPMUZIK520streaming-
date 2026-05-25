@@ -1,7 +1,7 @@
 backend:
   name: github
-  repo: edpmuzik-coder/EDPMUZIK520streaming-
-  branch: principal
+  repo: edpmuzik-coder/edpmuzik520streaming-
+  branch: main
 
 media_folder: "uploads"
 public_folder: "/uploads"
