@@ -1,1 +1,20 @@
+backend:
+  name: github
+  repo: edpmuzik-coder/EDPMUZIK520streaming- # Confirme se o nome do seu repositório está exato aqui
+  branch: principal
+
+media_folder: "uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "musicas"
+    label: "Músicas"
+    folder: "conteudo"
+    create: true
+    extension: "json"
+    format: "json"
+    fields:
+      - { label: "Título da Música", name: "titulo", widget: "string" }
+      - { label: "Nome do Artista", name: "artista", widget: "string" }
+      - { label: "Escolher Arquivo de Áudio (.mp3)", name: "arquivo", widget: "file" }
 
