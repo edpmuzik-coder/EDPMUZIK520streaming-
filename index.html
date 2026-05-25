@@ -15,7 +15,7 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
         .card { background: var(--bg-nav); padding: 15px; border-radius: 6px; border: 1px solid var(--border); }
         .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; }
-        .card h3 { font-size: 15px; margin: 10px 0 2px 0; truncate; }
+        .card h3 { font-size: 15px; margin: 10px 0 2px 0; }
         .card p { font-size: 12px; color: var(--text-muted); margin: 0 0 10px 0; }
         .tag { background: var(--orange); color: black; font-weight: bold; font-size: 10px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; }
         iframe { width: 100%; border: none; border-radius: 4px; background: #000; }
@@ -36,7 +36,7 @@
         function exibirConteudo() {
             const listaMusicas = document.getElementById("lista-musicas");
             const listaVideos = document.getElementById("lista-videos");
-            let banco = JSON.parse(localStorage.getItem("edp_drive_streaming_v2") || "[]");
+            let banco = JSON.parse(localStorage.getItem("edp_edge_store") || "[]");
 
             listaMusicas.innerHTML = "";
             listaVideos.innerHTML = "";
@@ -59,14 +59,13 @@
                             <img src="https://google.com{item.capa_id}" onerror="this.src='https://unsplash.com'">
                             <h3>${item.titulo}</h3>
                             <p>${item.artista} • <span class="tag">${item.tipo}</span></p>
-                            <!-- Player Incorporado Seguro do Google Drive -->
                             <iframe src="https://google.com{item.arquivo_id}/preview" height="60"></iframe>
                         </div>`;
                 }
             });
 
-            if (!temMusica) listaMusicas.innerHTML = "<p>Nenhuma música enviada.</p>";
-            if (!temVideo) listaVideos.innerHTML = "<p>Nenhum vídeo enviado.</p>";
+            if (!temMusica) listaMusicas.innerHTML = "<p style='color:#666;'>Nenhuma música enviada.</p>";
+            if (!temVideo) listaVideos.innerHTML = "<p style='color:#666;'>Nenhum vídeo enviado.</p>";
         }
     </script>
 </body>
