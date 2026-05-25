@@ -17,15 +17,12 @@
     </style>
 </head>
 <body>
-
     <header>
         <h1>🍿 EDPMUZIK520streaming</h1>
         <p>Músicas enviadas pelo telefone</p>
         <a href="/admin/" class="admin-btn">🔑 Entrar como Admin</a>
     </header>
-
     <div class="grid" id="lista-musicas"></div>
-
     <script>
         fetch('/conteudo/musicas.json')
             .then(response => {
@@ -38,9 +35,9 @@
                 musicas.forEach(musica => {
                     lista.innerHTML += `
                         <div class="card">
-                            <h3>${musica.titulo}</h3>
-                            <p>Por: ${musica.artista}</p>
-                            <audio controls src="${musica.arquivo}"></audio>
+                            <h3>\${musica.titulo}</h3>
+                            <p>Por: \${musica.artista}</p>
+                            <audio controls src="\${musica.arquivo}"></audio>
                         </div>
                     `;
                 });
@@ -51,3 +48,4 @@
     </script>
 </body>
 </html>
+
