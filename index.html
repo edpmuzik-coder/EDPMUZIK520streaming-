@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDPMUZIK520streaming</title>
-    <!-- Script obrigatório para o sistema de login funcionar -->
     </script>
     <style>
         body { background-color: #09090b; color: #ededed; font-family: sans-serif; padding: 20px; text-align: center; }
@@ -22,19 +21,15 @@
     <header>
         <h1>🍿 EDPMUZIK520streaming</h1>
         <p>Músicas enviadas pelo telefone</p>
-        <!-- Atalho direto para o painel de controlo -->
         <a href="/admin/" class="admin-btn">🔑 Entrar como Admin</a>
     </header>
 
-    <div class="grid" id="lista-musicas">
-        <!-- As músicas enviadas pelo painel vão aparecer aqui automaticamente -->
-    </div>
+    <div class="grid" id="lista-musicas"></div>
 
     <script>
-        // Carrega automaticamente os ficheiros guardados pelo painel
         fetch('/conteudo/musicas.json')
             .then(response => {
-                if (!response.ok) throw new Error("Sem músicas cadastradas.");
+                if (!response.ok) throw new Error();
                 return response.json();
             })
             .then(data => {
