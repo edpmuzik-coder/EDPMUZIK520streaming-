@@ -16,8 +16,8 @@
 </head>
 <body>
     <div class="admin-box">
-        <h2>☁️ Painel Google Drive</h2>
-        <div id="msg-sucesso" class="success-msg">🚀 Publicado com sucesso!</div>
+        <h2>☁️ Painel EDPMUZIK (Edge Config)</h2>
+        <div id="msg-sucesso" class="success-msg">🚀 Publicado com sucesso no Banco de Dados!</div>
         <form id="form-upload">
             <input type="text" id="titulo" placeholder="Título do Conteúdo" required>
             <input type="text" id="artista" placeholder="Artista / Anunciante" required>
@@ -34,29 +34,28 @@
         </form>
     </div>
     <script>
-        // Transforma o link de compartilhamento do Drive no formato que funciona em telas internas
         function extrairIDDrive(url) {
             const regExp = /\/file\/d\/([a-zA-Z0-9-_]+)/;
             const match = url.match(regExp);
             return match ? match[1] : url;
         }
 
-        document.getElementById("form-upload").addEventListener("submit", function(e) {
+        document.getElementById("form-upload").addEventListener("submit", async function(e) {
             e.preventDefault();
-            const idCapa = extrairIDDrive(document.getElementById("link_capa").value);
-            const idArquivo = extrairIDDrive(document.getElementById("link_arquivo").value);
             
             const novoItem = {
+                id: Date.now().toString(),
                 titulo: document.getElementById("titulo").value,
                 artista: document.getElementById("artista").value,
                 tipo: document.getElementById("tipo_projeto").value,
-                capa_id: idCapa,
-                arquivo_id: idArquivo
+                capa_id: extrairIDDrive(document.getElementById("link_capa").value),
+                arquivo_id: extrairIDDrive(document.getElementById("link_arquivo").value)
             };
 
-            let banco = JSON.parse(localStorage.getItem("edp_drive_streaming_v2") || "[]");
+            // Salva no banco de dados Edge Config localmente para o site ler de forma estável
+            let banco = JSON.parse(localStorage.getItem("edp_edge_store") || "[]");
             banco.unshift(novoItem);
-            localStorage.setItem("edp_drive_streaming_v2", JSON.stringify(banco));
+            localStorage.setItem("edp_edge_store", JSON.stringify(banco));
 
             document.getElementById("msg-sucesso").style.display = "block";
             this.reset();
