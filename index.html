@@ -5,16 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDPMUZIK520streaming — Discover</title>
     <style>
-        :root { --bg-main: #111111; --bg-nav: #222222; --orange: #ff5500; --text-main: #eeeeee; --text-muted: #999999; --border: #333333; }
+        :root {
+            --bg-main: #111111;
+            --bg-nav: #222222;
+            --orange: #ff5500;
+            --text-main: #eeeeee;
+            --text-muted: #999999;
+            --border: #333333;
+        }
         body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 0; }
+        
         nav { background: var(--bg-nav); height: 50px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
         nav .logo { font-weight: bold; color: white; display: flex; align-items: center; gap: 8px; font-size: 16px; margin-right: 30px; }
         nav .logo span { color: var(--orange); }
         nav .menu-links { display: flex; gap: 20px; font-size: 14px; font-weight: 500; }
         nav .menu-links a { color: var(--text-muted); text-decoration: none; }
         nav .menu-links a.active { color: white; border-bottom: 4px solid var(--orange); padding-bottom: 13px; }
+
         .container { max-width: 1240px; margin: 80px auto 40px auto; padding: 0 20px; text-align: left; }
+        
         h2 { font-size: 22px; font-weight: 700; margin: 30px 0 15px 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; margin-bottom: 40px; }
         .card { background: transparent; }
         .card .cover-art { width: 100%; aspect-ratio: 1/1; background: #222; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; }
@@ -26,6 +37,7 @@
     </style>
 </head>
 <body>
+
     <nav>
         <div class="logo">☁️ <span>EDPMUZIK</span></div>
         <div class="menu-links">
@@ -34,24 +46,42 @@
             <a href="#">Library</a>
         </div>
     </nav>
+
     <div class="container">
+        
         <h2>Curated by EDPMUZIK</h2>
-        <div class="grid" id="lista-musicas"></div>
+        <div class="grid" id="lista-musicas">
+            <!-- Os lançamentos vão aparecer aqui sem o painel de controlo -->
+        </div>
+
+        <h2>Trending by genre</h2>
+        <div class="grid">
+            <div class="card"><div class="cover-art"><img src="https://unsplash.com" alt="Rap"></div><h3>Hip-Hop & Rap</h3><p>Trending tracks</p></div>
+            <div class="card"><div class="cover-art"><img src="https://unsplash.com" alt="Trap"></div><h3>Trap beats</h3><p>Fresh list</p></div>
+            <div class="card"><div class="cover-art"><img src="https://unsplash.com" alt="Afro"></div><h3>Afro House</h3><p>Global rhythms</p></div>
+        </div>
+
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", exibirMusicas);
+
         function exibirMusicas() {
             const lista = document.getElementById("lista-musicas");
             let bancoMusicas = JSON.parse(localStorage.getItem("edp_drive_streaming") || "[]");
+
             if (bancoMusicas.length === 0) {
                 lista.innerHTML = `<p style="color:#666;">Nenhum lançamento publicado ainda.</p>`;
                 return;
             }
+
             lista.innerHTML = "";
             bancoMusicas.forEach(item => {
                 lista.innerHTML += `
                     <div class="card">
-                        <div class="cover-art"><img src="${item.capa_url}" alt="Capa" onerror="this.src='https://unsplash.com'"></div>
+                        <div class="cover-art">
+                            <img src="${item.capa_url}" alt="Capa" onerror="this.src='https://unsplash.com'">
+                        </div>
                         <h3>${item.titulo}</h3>
                         <p>${item.artista}</p>
                         <span class="tipo-tag">${item.tipo}</span>
@@ -60,7 +90,7 @@
             });
         }
     </script>
+
 </body>
 </html>
-
 
