@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDPMUZIK520streaming</title>
+    </script>
+    <style>
+        body { background-color: #09090b; color: #ededed; font-family: sans-serif; padding: 20px; text-align: center; }
+        header { border-bottom: 1px solid #27272a; padding-bottom: 15px; margin-bottom: 20px; }
+        header h1 { color: #e11d48; margin: 0; font-size: 22px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 15px; }
+        audio { width: 100%; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🍿 EDPMUZIK520streaming</h1>
+        <p>Músicas enviadas pelo telefone</p>
+    </header>
+
+    <div class="grid" id="lista-musicas">
+        <!-- As músicas enviadas pelo painel vão aparecer aqui automaticamente -->
+    </div>
+
+    <script>
+        // Script simples para carregar os arquivos enviados pelo painel de administração
+        fetch('/conteudo/musicas.json')
+            .then(response => response.json())
+            .then(data => {
+                const lista = document.getElementById('lista-musicas');
+                data.forEach(musica => {
+                    lista.innerHTML += `
+                        <div class="card">
+                            <h3>${musica.titulo}</h3>
+                            <p>Por: ${musica.artista}</p>
+                            <audio controls src="${musica.arquivo}"></audio>
+                        </div>
+                    `;
+                });
+            }).catch(err => console.log("Ainda não há músicas cadastradas."));
+    </script>
+</body>
+</html>
 
