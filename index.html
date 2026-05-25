@@ -5,27 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDPMUZIK520streaming — Discover</title>
     <style>
-        :root {
-            --bg-main: #111111;
-            --bg-nav: #222222;
-            --orange: #ff5500;
-            --text-main: #eeeeee;
-            --text-muted: #999999;
-            --border: #333333;
-        }
+        :root { --bg-main: #111111; --bg-nav: #222222; --orange: #ff5500; --text-main: #eeeeee; --text-muted: #999999; --border: #333333; }
         body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 0; }
-        
         nav { background: var(--bg-nav); height: 50px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
         nav .logo { font-weight: bold; color: white; display: flex; align-items: center; gap: 8px; font-size: 16px; margin-right: 30px; }
         nav .logo span { color: var(--orange); }
         nav .menu-links { display: flex; gap: 20px; font-size: 14px; font-weight: 500; }
         nav .menu-links a { color: var(--text-muted); text-decoration: none; }
         nav .menu-links a.active { color: white; border-bottom: 4px solid var(--orange); padding-bottom: 13px; }
-
         .container { max-width: 1240px; margin: 80px auto 40px auto; padding: 0 20px; text-align: left; }
-        
         h2 { font-size: 22px; font-weight: 700; margin: 30px 0 15px 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; margin-bottom: 40px; }
         .card { background: transparent; }
         .card .cover-art { width: 100%; aspect-ratio: 1/1; background: #222; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; }
@@ -34,21 +23,9 @@
         .card p { font-size: 12px; color: var(--text-muted); margin: 0; }
         .card .tipo-tag { display: inline-block; background: var(--orange); color: black; font-weight: bold; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-top: 5px; text-transform: uppercase; }
         audio { width: 100%; margin-top: 8px; height: 30px; }
-
-        .admin-box { background: var(--bg-nav); border: 1px solid var(--border); max-width: 450px; margin: 50px auto; padding: 25px; border-radius: 8px; box-sizing: border-box; }
-        .admin-box h2 { color: var(--orange); border: none; margin-top: 0; font-size: 18px; padding: 0; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-main); color: white; box-sizing: border-box; font-size: 14px; }
-        select { cursor: pointer; }
-        input:focus, select:focus { border-color: var(--orange); outline: none; }
-        label { font-size: 12px; color: var(--text-muted); display: block; margin-top: 10px; }
-        button { background: var(--orange); border: none; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 15px; color: white; }
-        button:hover { background: #e04b00; }
-        
-        .success-msg { background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; padding: 12px; border-radius: 4px; margin-bottom: 15px; display: none; font-size: 14px; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
-
     <nav>
         <div class="logo">☁️ <span>EDPMUZIK</span></div>
         <div class="menu-links">
@@ -57,131 +34,24 @@
             <a href="#">Library</a>
         </div>
     </nav>
-
     <div class="container">
-        
         <h2>Curated by EDPMUZIK</h2>
-        <div class="grid" id="lista-musicas">
-            <!-- Os uploads rápidos entram aqui -->
-        </div>
-
-        <h2>Trending by genre</h2>
-        <div class="grid">
-            <div class="card"><div class="cover-art"><img src="https://unsplash.com" alt="Rap"></div><h3>Hip-Hop & Rap</h3><p>Trending tracks</p></div>
-            <div class="card"><div class="cover-art"><img src="https://unsplash.com" alt="Trap"></div><h3>Trap beats</h3><p>Fresh list</p></div>
-            <div class="card"><div class="cover-art"><img src="https://unsplash.com" alt="Afro"></div><h3>Afro House</h3><p>Global rhythms</p></div>
-        </div>
-
-        <div class="admin-box">
-            <h2>☁️ Painel Administrativo EDPMUZIK</h2>
-            
-            <div id="msg-sucesso" class="success-msg">🚀 Publicado com sucesso no feed!</div>
-            
-            <form id="form-upload">
-                <input type="text" id="titulo" placeholder="Título da Música ou Projeto" required>
-                <input type="text" id="artista" placeholder="Nome do Artista / Colaborador" required>
-                
-                <label>Tipo de Lançamento:</label>
-                <select id="tipo_projeto">
-                    <option value="Música Solo">Música Solo</option>
-                    <option value="EP">Projeto: EP</option>
-                    <option value="Mixtape">Projeto: Mixtape</option>
-                    <option value="Álbum">Projeto: Álbum</option>
-                    <option value="Publicidade">Vídeo / Publicidade</option>
-                </select>
-
-                <label>Vincular a:</label>
-                <select id="tipo_artista">
-                    <option value="Produtora">Artista da Minha Produtora</option>
-                    <option value="Colaborador">Músico Colaborador</option>
-                    <option value="Independente">Músico Independente</option>
-                </select>
-
-                <label>Imagem de Capa (Carregar do Dispositivo):</label>
-                <input type="file" id="imagem_capa" accept="image/*" required>
-                
-                <label>Arquivo de Áudio (Carregar do Dispositivo):</label>
-                <input type="file" id="arquivo_audio" accept="audio/*" required>
-                
-                <button type="submit" id="btn-submit">Subir Projeto Agora 🚀</button>
-            </form>
-        </div>
-
+        <div class="grid" id="lista-musicas"></div>
     </div>
-
     <script>
-        const form = document.getElementById("form-upload");
-        const btnSubmit = document.getElementById("btn-submit");
-
         document.addEventListener("DOMContentLoaded", exibirMusicas);
-
-        form.addEventListener("submit", function(e) {
-            e.preventDefault();
-            btnSubmit.innerText = "A processar ficheiros...";
-            btnSubmit.disabled = true;
-
-            const titulo = document.getElementById("titulo").value;
-            const artista = document.getElementById("artista").value;
-            const tipo = document.getElementById("tipo_projeto").value;
-            const vinculo = document.getElementById("tipo_artista").value;
-            const capaFile = document.getElementById("imagem_capa").files[0];
-            const audioFile = document.getElementById("arquivo_audio").files[0];
-
-            const readerCapa = new FileReader();
-            const readerAudio = new FileReader();
-
-            readerCapa.readAsDataURL(capaFile);
-            readerCapa.onload = function() {
-                const capaBase64 = readerCapa.result;
-
-                readerAudio.readAsDataURL(audioFile);
-                readerAudio.onload = function() {
-                    const audioBase64 = readerAudio.result;
-
-                    const novaMusica = {
-                        titulo,
-                        artista: `${artista} (${vinculo})`,
-                        tipo,
-                        capa_url: capaBase64,
-                        audio_url: audioBase64
-                    };
-
-                    let bancoMusicas = JSON.parse(localStorage.getItem("edp_streaming") || "[]");
-                    bancoMusicas.unshift(novaMusica);
-                    localStorage.setItem("edp_streaming", JSON.stringify(bancoMusicas));
-
-                    document.getElementById("msg-sucesso").style.display = "block";
-                    form.reset();
-                    btnSubmit.innerText = "Subir Projeto Agora 🚀";
-                    btnSubmit.disabled = false;
-
-                    setTimeout(() => { document.getElementById("msg-sucesso").style.display = "none"; }, 4000);
-                    exibirMusicas();
-                };
-            };
-        });
-
         function exibirMusicas() {
             const lista = document.getElementById("lista-musicas");
-            let bancoMusicas = JSON.parse(localStorage.getItem("edp_streaming") || "[]");
-
+            let bancoMusicas = JSON.parse(localStorage.getItem("edp_drive_streaming") || "[]");
             if (bancoMusicas.length === 0) {
-                lista.innerHTML = `
-                    <div class="card">
-                        <div class="cover-art"><img src="https://unsplash.com" alt="Capa"></div>
-                        <h3>Sem lançamentos</h3>
-                        <p>EDPMUZIK</p>
-                    </div>`;
+                lista.innerHTML = `<p style="color:#666;">Nenhum lançamento publicado ainda.</p>`;
                 return;
             }
-
             lista.innerHTML = "";
             bancoMusicas.forEach(item => {
                 lista.innerHTML += `
                     <div class="card">
-                        <div class="cover-art">
-                            <img src="${item.capa_url}" alt="Capa">
-                        </div>
+                        <div class="cover-art"><img src="${item.capa_url}" alt="Capa" onerror="this.src='https://unsplash.com'"></div>
                         <h3>${item.titulo}</h3>
                         <p>${item.artista}</p>
                         <span class="tipo-tag">${item.tipo}</span>
@@ -190,9 +60,7 @@
             });
         }
     </script>
-
 </body>
 </html>
-
 
 
