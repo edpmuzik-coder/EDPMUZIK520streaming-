@@ -1,11 +1,3 @@
-Agora entendi perfeitamente o seu objetivo! Esse código que o agente do Netlify criou está com um visual lindo, no verdadeiro estilo SoundCloud, com as cores certas, fontes bem organizadas e toda a estrutura visual pronta. Você não quer perder essa identidade que já tinha desenhado.
-Como trocámos o servidor para a Vercel devido ao bloqueio de créditos, e você não quer ter de abrir códigos no GitHub nem converter links à mão, nós vamos dar um "cérebro" a esse exato código.
-Fiz uma alteração inteligente na parte do <script> e nos campos dele. O seu site continuará com a mesma aparência da imagem, mas agora o botão de upload vai funcionar de verdade e atualizar a tela no mesmo segundo, sem precisar do Google Drive.
-## 🛠️ O que fazer agora no seu GitHub:
-
-   1. Abra a edição desse seu ficheiro index.html no GitHub (onde tirou o print anterior).
-   2. Apague tudo e cole este código completo atualizado abaixo. Ele já contém os campos extras para EP, Mixtape e Álbum que você pediu, além de organizar os seus músicos colaboradores de forma automática:
-
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -23,7 +15,6 @@ Fiz uma alteração inteligente na parte do <script> e nos campos dele. O seu si
         }
         body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 0; }
         
-        /* Barra Superior Estilo SoundCloud */
         nav { background: var(--bg-nav); height: 50px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
         nav .logo { font-weight: bold; color: white; display: flex; align-items: center; gap: 8px; font-size: 16px; margin-right: 30px; }
         nav .logo span { color: var(--orange); }
@@ -35,7 +26,6 @@ Fiz uma alteração inteligente na parte do <script> e nos campos dele. O seu si
         
         h2 { font-size: 22px; font-weight: 700; margin: 30px 0 15px 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         
-        /* Grelha de Conteúdo e Capas Quadradas */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; margin-bottom: 40px; }
         .card { background: transparent; }
         .card .cover-art { width: 100%; aspect-ratio: 1/1; background: #222; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; }
@@ -45,7 +35,6 @@ Fiz uma alteração inteligente na parte do <script> e nos campos dele. O seu si
         .card .tipo-tag { display: inline-block; background: var(--orange); color: black; font-weight: bold; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-top: 5px; text-transform: uppercase; }
         audio { width: 100%; margin-top: 8px; height: 30px; }
 
-        /* Painel de Upload SoundCloud Style */
         .admin-box { background: var(--bg-nav); border: 1px solid var(--border); max-width: 450px; margin: 50px auto; padding: 25px; border-radius: 8px; box-sizing: border-box; }
         .admin-box h2 { color: var(--orange); border: none; margin-top: 0; font-size: 18px; padding: 0; }
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-main); color: white; box-sizing: border-box; font-size: 14px; }
@@ -60,7 +49,6 @@ Fiz uma alteração inteligente na parte do <script> e nos campos dele. O seu si
 </head>
 <body>
 
-    <!-- Barra de Navegação Superior -->
     <nav>
         <div class="logo">☁️ <span>EDPMUZIK</span></div>
         <div class="menu-links">
@@ -73,9 +61,8 @@ Fiz uma alteração inteligente na parte do <script> e nos campos dele. O seu si
     <div class="container">
         
         <h2>Curated by EDPMUZIK</h2>
-        <!-- Grelha Dinâmica que recebe os uploads na hora -->
         <div class="grid" id="lista-musicas">
-            <!-- Os uploads feitos abaixo vão aparecer aqui automaticamente -->
+            <!-- Os uploads rápidos entram aqui -->
         </div>
 
         <h2>Trending by genre</h2>
@@ -85,13 +72,11 @@ Fiz uma alteração inteligente na parte do <script> e nos campos dele. O seu si
             <div class="card"><div class="cover-art"><img src="https://unsplash.com" alt="Afro"></div><h3>Afro House</h3><p>Global rhythms</p></div>
         </div>
 
-        <!-- PAINEL DE CONTROL INTERNO (Vercel Integration) -->
         <div class="admin-box">
             <h2>☁️ Painel Administrativo EDPMUZIK</h2>
             
             <div id="msg-sucesso" class="success-msg">🚀 Publicado com sucesso no feed!</div>
             
-            <!-- Formulário com o botão rápido que você queria -->
             <form id="form-upload">
                 <input type="text" id="titulo" placeholder="Título da Música ou Projeto" required>
                 <input type="text" id="artista" placeholder="Nome do Artista / Colaborador" required>
@@ -124,12 +109,10 @@ Fiz uma alteração inteligente na parte do <script> e nos campos dele. O seu si
 
     </div>
 
-    <!-- Sistema Automático Local para não depender de Bancos Pagos -->
     <script>
         const form = document.getElementById("form-upload");
         const btnSubmit = document.getElementById("btn-submit");
 
-        // Carregar músicas salvas ao abrir a página
         document.addEventListener("DOMContentLoaded", exibirMusicas);
 
         form.addEventListener("submit", function(e) {
@@ -197,22 +180,19 @@ Fiz uma alteração inteligente na parte do <script> e nos campos dele. O seu si
                 lista.innerHTML += `
                     <div class="card">
                         <div class="cover-art">
+                            <img src="${item.capa_url}" alt="Capa">
+                        </div>
+                        <h3>${item.titulo}</h3>
+                        <p>${item.artista}</p>
+                        <span class="tipo-tag">${item.tipo}</span>
+                        <audio controls src="${item.audio_url}"></audio>
+                    </div>`;
+            });
+        }
+    </script>
 
-
-
-${item.titulo}</h3> <p>${item.artista}
-${item.tipo}</span> <audio controls src="${item.audio_url}">
-`;
-});
-}
-
-
-### 💾 Salve e veja o resultado:
-Depois de colar o código acima no seu GitHub, guarde as alterações (**Commit changes**). A Vercel vai detetar a mudança e atualizar o seu site em menos de 10 segundos.
-
-Abra o seu site, preencha o formulário escolhendo se é **Artista da Produtora, Colaborador ou Independente**, selecione os arquivos do seu computador e clique no botão. A música vai aparecer no topo na hora! 
-
-Diga-me se o botão ficou rápido como você queria!
+</body>
+</html>
 
 
 
