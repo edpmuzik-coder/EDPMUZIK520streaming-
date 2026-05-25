@@ -3,63 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controlo — EDPMUZIK</title>
+    <title>Painel Google Drive — EDPMUZIK</title>
     <style>
-        :root { --bg-main: #111111; --bg-nav: #222222; --orange: #ff5500; --text-main: #eeeeee; --text-muted: #999999; --border: #333333; }
+        :root { --bg-main: #111111; --bg-nav: #222222; --orange: #ff5500; --text-main: #eeeeee; --border: #333333; }
         body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; padding: 20px; text-align: center; }
-        .admin-box { background: var(--bg-nav); border: 1px solid var(--border); max-width: 450px; margin: 50px auto; padding: 25px; border-radius: 8px; box-sizing: border-box; text-align: left; }
-        .admin-box h2 { color: var(--orange); margin-top: 0; font-size: 18px; text-align: center; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-main); color: white; box-sizing: border-box; font-size: 14px; }
-        button { background: var(--orange); border: none; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 15px; color: white; }
-        button:hover { background: #e04b00; }
-        .success-msg { background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; padding: 12px; border-radius: 4px; margin-bottom: 15px; display: none; font-size: 14px; text-align: center; font-weight: bold; }
+        .admin-box { background: var(--bg-nav); border: 1px solid var(--border); max-width: 450px; margin: 30px auto; padding: 25px; border-radius: 8px; text-align: left; }
+        .admin-box h2 { color: var(--orange); text-align: center; margin-top: 0; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-main); color: white; box-sizing: border-box; }
+        button { background: var(--orange); border: none; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 15px; }
+        .success-msg { background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; padding: 12px; border-radius: 4px; display: none; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="admin-box">
-        <h2>☁️ Painel Exclusivo EDPMUZIK</h2>
-        <div id="msg-sucesso" class="success-msg">🚀 Publicado com sucesso no site público!</div>
+        <h2>☁️ Painel Google Drive</h2>
+        <div id="msg-sucesso" class="success-msg">🚀 Publicado com sucesso!</div>
         <form id="form-upload">
-            <input type="text" id="titulo" placeholder="Título da Música ou Projeto" required>
-            <input type="text" id="artista" placeholder="Nome do Artista" required>
+            <input type="text" id="titulo" placeholder="Título do Conteúdo" required>
+            <input type="text" id="artista" placeholder="Artista / Anunciante" required>
             <select id="tipo_projeto">
                 <option value="Música Solo">Música Solo</option>
                 <option value="EP">Projeto: EP</option>
                 <option value="Mixtape">Projeto: Mixtape</option>
                 <option value="Álbum">Projeto: Álbum</option>
+                <option value="Publicidade">Vídeo / Publicidade</option>
             </select>
-            <select id="tipo_artista">
-                <option value="Produtora">Artista da Produtora</option>
-                <option value="Colaborador">Músico Colaborador</option>
-                <option value="Independente">Músico Independente</option>
-            </select>
-            <input type="url" id="link_capa_drive" placeholder="Link da Capa do Google Drive" required>
-            <input type="url" id="link_audio_drive" placeholder="Link do Áudio do Google Drive" required>
+            <input type="url" id="link_capa" placeholder="Link da Capa/Foto no Google Drive" required>
+            <input type="url" id="link_arquivo" placeholder="Link do MP3 ou Vídeo no Google Drive" required>
             <button type="submit">Publicar Lançamento 🚀</button>
         </form>
     </div>
     <script>
-        function converterLinkDrive(url, tipo) {
+        // Transforma o link de compartilhamento do Drive no formato que funciona em telas internas
+        function extrairIDDrive(url) {
             const regExp = /\/file\/d\/([a-zA-Z0-9-_]+)/;
             const match = url.match(regExp);
-            if (match && match[1]) {
-                return tipo === 'imagem' ? `https://google.com{match[1]}` : `https://google.com{match[1]}`;
-            }
-            return url;
+            return match ? match[1] : url;
         }
+
         document.getElementById("form-upload").addEventListener("submit", function(e) {
             e.preventDefault();
-            const titulo = document.getElementById("titulo").value;
-            const artista = document.getElementById("artista").value;
-            const tipo = document.getElementById("tipo_projeto").value;
-            const vinculo = document.getElementById("tipo_artista").value;
-            const capaDireta = converterLinkDrive(document.getElementById("link_capa_drive").value, 'imagem');
-            const audioDireta = converterLinkDrive(document.getElementById("link_audio_drive").value, 'audio');
+            const idCapa = extrairIDDrive(document.getElementById("link_capa").value);
+            const idArquivo = extrairIDDrive(document.getElementById("link_arquivo").value);
+            
+            const novoItem = {
+                titulo: document.getElementById("titulo").value,
+                artista: document.getElementById("artista").value,
+                tipo: document.getElementById("tipo_projeto").value,
+                capa_id: idCapa,
+                arquivo_id: idArquivo
+            };
 
-            const novaMusica = { titulo, artista: `${artista} (${vinculo})`, tipo, capa_url: capaDireta, audio_url: audioDireta };
-            let bancoMusicas = JSON.parse(localStorage.getItem("edp_drive_streaming") || "[]");
-            bancoMusicas.unshift(novaMusica);
-            localStorage.setItem("edp_drive_streaming", JSON.stringify(bancoMusicas));
+            let banco = JSON.parse(localStorage.getItem("edp_drive_streaming_v2") || "[]");
+            banco.unshift(novoItem);
+            localStorage.setItem("edp_drive_streaming_v2", JSON.stringify(banco));
 
             document.getElementById("msg-sucesso").style.display = "block";
             this.reset();
