@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: edpmuzik-coder/EDPMUZIK520streaming- # Confirme se o nome do seu repositório está exato aqui
+  repo: edpmuzik-coder/EDPMUZIK520streaming-
   branch: principal
 
 media_folder: "uploads"
@@ -17,4 +17,3 @@ collections:
       - { label: "Título da Música", name: "titulo", widget: "string" }
       - { label: "Nome do Artista", name: "artista", widget: "string" }
       - { label: "Escolher Arquivo de Áudio (.mp3)", name: "arquivo", widget: "file" }
-
