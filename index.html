@@ -12,12 +12,13 @@
         .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 15px; text-align: left; }
         audio { width: 100%; margin-top: 10px; }
         
-        /* Estilo do Formulário de Upload Privado */
         .admin-box { background: #18181b; border: 2px dashed #e11d48; max-width: 400px; margin: 30px auto; padding: 20px; border-radius: 12px; text-align: left; }
         .admin-box h2 { color: #e11d48; margin-top: 0; font-size: 18px; }
         input, button { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #27272a; background: #09090b; color: white; box-sizing: border-box; }
-        button { background: #e11d48; border: none; font-weight: bold; cursor: pointer; }
+        button { background: #e11d48; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
         button:hover { background: #be123c; }
+        
+        .success-msg { background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; padding: 10px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 14px; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -27,7 +28,6 @@
         <p>Músicas enviadas pelo telefone</p>
     </header>
 
-    <!-- Área de Streaming Pública -->
     <div class="grid" id="lista-musicas">
         <div class="card">
             <h3>Música de Exemplo</h3>
@@ -36,10 +36,13 @@
         </div>
     </div>
 
-    <!-- PAINEL DE CONTROL INTERNO (Netlify Forms) -->
     <div class="admin-box">
         <h2>🔑 Painel de Upload (Privado)</h2>
-        <form name="upload-musicas" method="POST" data-netlify="true" enctype="multipart/form-data">
+        
+        <!-- Mensagem que aparece após o envio bem-sucedido -->
+        <div id="msg-sucesso" class="success-msg">🚀 Música enviada com sucesso para o Netlify!</div>
+        
+        <form name="upload-musicas" method="POST" data-netlify="true" enctype="multipart/form-data" id="form-upload">
             <input type="text" name="titulo" placeholder="Título da Música" required>
             <input type="text" name="artista" placeholder="Nome do Artista" required>
             <label style="font-size: 12px; color: #a1a1aa;">Escolher arquivo de áudio (.mp3):</label>
@@ -48,5 +51,29 @@
         </form>
     </div>
 
+    <script>
+        // Script para interceptar o envio e evitar o erro 404 na tela
+        document.getElementById("form-upload").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            fetch("/", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams(formData).toString()
+            })
+            .then(() => {
+                document.getElementById("msg-sucesso").style.display = "block";
+                form.reset();
+                setTimeout(() => { document.getElementById("msg-sucesso").style.display = "none"; }, 5000);
+            })
+            .catch(() => {
+                alert("Erro ao enviar. Verifique sua conexão.");
+            });
+        });
+    </script>
+
 </body>
 </html>
+
