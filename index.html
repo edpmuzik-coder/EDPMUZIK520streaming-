@@ -4,125 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDPMUZIK520 Streaming</title>
-    <!-- Tailwind CSS para um visual moderno e limpo -->
-    <script src="https://jsdelivr.net"></script>
-    <!-- Biblioteca oficial do Supabase -->
-    <script src="https://jsdelivr.net"></script>
+    <style>
+        body { background-color: #111111; color: #eeeeee; font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
+        .painel { max-width: 450px; margin: 20px auto; background: #222222; padding: 20px; border-radius: 10px; border: 1px solid #ff5500; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border-radius: 5px; border: 1px solid #333; background: #111; color: white; }
+        button { background: #ff5500; font-weight: bold; cursor: pointer; border: none; }
+        button:hover { background: #e04400; }
+        .grid-musicas { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; max-w: 1000px; margin: 40px auto 0 auto; }
+        .card { background: #222222; padding: 15px; border-radius: 10px; border: 1px solid #333; text-align: left; }
+        .card img { width: 100%; height: 220px; object-fit: cover; border-radius: 8px; }
+        .tag { display: inline-block; background: #ff5500; padding: 3px 8px; border-radius: 5px; font-size: 12px; margin: 10px 0; text-transform: uppercase; font-weight: bold; color: black; }
+        audio { width: 100%; margin-top: 10px; }
+    </style>
 </head>
-<body class="bg-[#121212] text-white font-sans p-6">
+<body>
 
-    <h1 class="text-3xl font-bold text-center mb-8">EDPMUZIK520 STREAMING</h1>
+    <h1>EDPMUZIK520 STREAMING</h1>
 
-    <!-- ⚡ PAINEL DE PUBLICAÇÃO RÁPIDA (SEM GOOGLE DRIVE) -->
-    <div class="max-w-md mx-auto bg-[#1e1e1e] p-6 rounded-xl border border-[#1db954] mb-10">
-        <h2 class="text-xl font-bold mb-4 text-[#1db954] text-center">Painel de Upload Rápido</h2>
-        <form id="uploadForm" class="space-y-4">
-            <div>
-                <label class="block text-sm text-gray-400 mb-1">Título do Lançamento</label>
-                <input type="text" id="titulo" class="w-full p-2 bg-[#333] border border-[#444] rounded text-white" required>
-            </div>
-            <div>
-                <label class="block text-sm text-gray-400 mb-1">Tipo de Projeto</label>
-                <select id="tipo" class="w-full p-2 bg-[#333] border border-[#444] rounded text-white">
-                    <option value="Singles">Single / Música Solo</option>
-                    <option value="Álbuns & EPs">Álbum / EP</option>
-                    <option value="Mixtapes">Mixtape</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm text-gray-400 mb-1">Selecione a Capa (Imagem)</label>
-                <input type="file" id="capaFile" accept="image/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-[#1db954] file:text-white" required>
-            </div>
-            <div>
-                <label class="block text-sm text-gray-400 mb-1">Selecione a Música (Áudio MP3)</label>
-                <input type="file" id="audioFile" accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-[#1db954] file:text-white" required>
-            </div>
-            <button type="submit" class="w-full bg-[#1db954] hover:bg-[#1aa34a] text-white font-bold py-2 rounded transition">
-                Subir Música Agora 🚀
-            </button>
+    <!-- ⚡ PAINEL DE UPLOAD DIRETO POR ARQUIVOS -->
+    <div class="painel">
+        <h3>Painel de Publicação Rápida</h3>
+        <p style="font-size: 13px; color: #999;">Selecione os arquivos direto do seu dispositivo</p>
+        
+        <form name="streaming-uploads" method="POST" data-netlify="true" enctype="multipart/form-data">
+            <input type="text" name="titulo" placeholder="Título do Lançamento" required>
+            
+            <select name="categoria">
+                <option value="Single">Single / Música Solo</option>
+                <option value="EP">Projeto: EP</option>
+                <option value="Mixtape">Projeto: Mixtape</option>
+                <option value="Álbum">Projeto: Álbum</option>
+            </select>
+
+            <label style="display:block; text-align:left; font-size:12px; color:#aaa;">Foto da Capa:</label>
+            <input type="file" name="foto_capa" accept="image/*" required>
+
+            <label style="display:block; text-align:left; font-size:12px; color:#aaa;">Arquivo de Áudio (MP3):</label>
+            <input type="file" name="audio_musica" accept="audio/*" required>
+
+            <button type="submit">Subir Música Agora 🚀</button>
         </form>
-        <p id="status" class="text-center mt-3 text-sm font-semibold"></p>
     </div>
 
-    <!-- 🎵 ÁREA DOS LANÇAMENTOS (ATUALIZA SOZINHA) -->
-    <div id="feedMusicas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-        <!-- As músicas vão aparecer aqui automaticamente assim que clicar no botão -->
+    <!-- 🎵 ÁREA DOS LANÇAMENTOS -->
+    <div class="grid-musicas" id="feed">
+        <!-- Música de exemplo demonstrativa -->
+        <div class="card">
+            <img src="https://postimages.org" alt="Capa">
+            <span class="tag">Single</span>
+            <h3 style="margin:5px 0;">master rrr</h3>
+            <p style="margin:0; color:#999;">EDPMUZIK</p>
+            <audio src="" controls></audio>
+        </div>
     </div>
 
-    <script>
-        // ======= CONFIGURAÇÃO DO SEU BANCO DE DADOS GRATUITO =======
-        // Criaremos estas chaves no passo seguinte para o botão funcionar
-        const SUPABASE_URL = 'COLOQUE_SUA_URL_AQUI';
-        const SUPABASE_KEY = 'COLOQUE_SUA_CHAVE_ANON_AQUI';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        const form = document.getElementById('uploadForm');
-        const statusText = document.getElementById('status');
-
-        // Função automática para carregar e exibir as músicas na tela
-        async function carregarMusicas() {
-            const feed = document.getElementById('feedMusicas');
-            feed.innerHTML = "<p class='text-gray-400 text-center col-span-full'>A carregar lançamentos...</p>";
-
-            const { data, error } = await supabase.from('streaming_musicas').select('*').order('created_at', { ascending: false });
-            if (error) return;
-
-            feed.innerHTML = "";
-            data.forEach(item => {
-                feed.innerHTML += `
-                    <div class="bg-[#1e1e1e] p-4 rounded-xl border border-gray-800 flex flex-col justify-between">
-                        <img src="${item.capa_url}" class="w-full h-48 object-cover rounded-lg mb-3">
-                        <span class="text-xs bg-[#333] px-2 py-1 rounded text-gray-300 w-max mb-2">${item.tipo}</span>
-                        <h3 class="font-bold text-lg truncate">${item.titulo}</h3>
-                        <p class="text-gray-400 text-sm mb-3">EDPMUZIK</p>
-                        <audio src="${item.audio_url}" controls class="w-full"></audio>
-                    </div>
-                `;
-            });
-        }
-
-        // Envio rápido ao clicar no botão
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            statusText.innerText = "A carregar arquivos para o site...";
-            statusText.className = "text-yellow-400 text-center mt-3";
-
-            const titulo = document.getElementById('titulo').value;
-            const tipo = document.getElementById('tipo').value;
-            const capa = document.getElementById('capaFile').files[0];
-            const audio = document.getElementById('audioFile').files[0];
-
-            try {
-                const idUnico = Date.now();
-                
-                // 1. Upload automático da foto
-                const nomeCapa = `capa_${idUnico}_${capa.name}`;
-                await supabase.storage.from('arquivos_streaming').upload(`capas/${nomeCapa}`, capa);
-                const { data: urlCapa } = supabase.storage.from('arquivos_streaming').getPublicUrl(`capas/${nomeCapa}`);
-
-                // 2. Upload automático do MP3
-                const nomeAudio = `audio_${idUnico}_${audio.name}`;
-                await supabase.storage.from('arquivos_streaming').upload(`musicas/${nomeAudio}`, audio);
-                const { data: urlAudio } = supabase.storage.from('arquivos_streaming').getPublicUrl(`musicas/${nomeAudio}`);
-
-                // 3. Salva no banco de dados para atualizar o site na hora
-                await supabase.from('streaming_musicas').insert([
-                    { titulo, tipo, capa_url: urlCapa.publicUrl, audio_url: urlAudio.publicUrl }
-                ]);
-
-                statusText.innerText = "Publicado com sucesso! Apareceu na tela.";
-                statusText.className = "text-green-500 text-center mt-3";
-                form.reset();
-                carregarMusicas();
-
-            } catch (err) {
-                statusText.innerText = "Erro ao subir arquivos.";
-                statusText.className = "text-red-500 text-center mt-3";
-            }
-        });
-
-        // Inicia o site buscando as músicas guardadas
-        carregarMusicas();
-    </script>
 </body>
 </html>
