@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controlo Avançado — EDPMUZIK</title>
+    <title>Painel de Controlo Geral — EDPMUZIK</title>
     <style>
         :root { --bg-main: #111111; --bg-nav: #222222; --orange: #ff5500; --text-main: #eeeeee; --border: #333333; }
         body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 20px; }
         .grid-admin { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; max-w: 1400px; margin: 0 auto; }
-        .box { background: var(--bg-nav); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
+        .box { background: var(--bg-nav); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
         h2 { color: var(--orange); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 18px; }
         input, select, button, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-main); color: white; box-sizing: border-box; font-size: 14px; }
         button { background: var(--orange); border: none; font-weight: bold; cursor: pointer; color: white; }
@@ -24,68 +24,74 @@
         .tag-status { font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
         .status-pendente { background: #f57c00; color: white; }
         .status-aprovado { background: #2e7d32; color: white; }
-        iframe { width: 100%; border: none; height: 60px; margin-top: 10px; background: #000; border-radius: 4px; }
+        .seletor-dinamico { border: 1px solid var(--orange); }
     </style>
 </head>
 <body>
 
-    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ CONTROLADOR DE PASTAS & SISTEMA DE APROVAÇÃO EDPMUZIK</h1>
+    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ CONTROLADOR GERAL EDPMUZIK (PASTAS & PUBLICIDADE)</h1>
 
     <div class="grid-admin">
         <div>
-            <!-- Form de Criar Pastas de Artistas -->
+            <!-- FORMULÁRIO 1: CRIAR PASTA VIRTUAL -->
             <div class="box">
-                <h2>📁 Criar Pastas de Artistas</h2>
+                <h2>📁 Criar Pasta de Artista / Colaborador</h2>
                 <form id="form-artista">
-                    <input type="text" id="nome_artista" placeholder="Nome do Artista / Produtor" required>
+                    <input type="text" id="nome_artista" placeholder="Nome do Artista, Produtor ou Empresa" required>
                     <select id="categoria_artista">
                         <option value="Produtora">Artistas da Produtora</option>
                         <option value="Solo">Músicos a Solo</option>
                         <option value="Colaborador">Músicos Colaboradores</option>
                         <option value="Produtor">Produtores (Beats)</option>
+                        <option value="Anunciante">Anunciante (Publicidade)</option>
                     </select>
-                    <textarea id="bio_artista" placeholder="Biografia do artista..." rows="2" required></textarea>
-                    <button type="submit" style="background:#444;">Criar Pasta Virtual 📁</button>
+                    <textarea id="bio_artista" placeholder="Biografia do artista ou notas da publicidade..." rows="2" required></textarea>
+                    <button type="submit" style="background:#444;">Criar / Registrar Pasta 📁</button>
                 </form>
             </div>
 
-            <!-- Form de Publicar no Site -->
-            <div class="box" style="margin-top:20px;">
-                <h2>🚀 Publicar Novo Conteúdo</h2>
+            <!-- FORMULÁRIO 2: PUBLICAR NO SITE -->
+            <div class="box">
+                <h2>🚀 Publicar no Site (Música, Vídeo ou Banner)</h2>
                 <form id="form-upload">
-                    <input type="text" id="titulo" placeholder="Título do Lançamento" required>
+                    <input type="text" id="titulo" placeholder="Título do Conteúdo" required>
                     
-                    <label style="font-size:12px; color:#aaa;">Vincular à Pasta do Artista:</label>
-                    <select id="artista_venculo" required></select>
+                    <label style="font-size:12px; color:#aaa;">Escolher uma Pasta Já Existente:</label>
+                    <select id="artista_venculo" class="seletor-dinamico" required>
+                        <!-- As pastas criadas acima entram aqui sozinhas -->
+                    </select>
 
                     <select id="tipo_projeto" onchange="verificarTipo()">
                         <option value="Música Solo">Música Solo / Single</option>
                         <option value="EP">Projeto: EP</option>
                         <option value="Mixtape">Projeto: Mixtape</option>
                         <option value="Álbum">Projeto: Álbum</option>
+                        <option value="Vídeo Clipe">Vídeo Clipe Musical</option>
+                        <option value="Banner Publicidade">Banner de Publicidade (Foto)</option>
+                        <option value="Vídeo Publicidade">Vídeo de Publicidade</option>
                     </select>
 
-                    <!-- Campo de Faixas que pediu -->
                     <div id="campo-faixas" style="display:none;">
-                        <input type="number" id="num_faixas" placeholder="Número de Faixas / Músicas do Projeto" min="1" value="1">
+                        <input type="number" id="num_faixas" placeholder="Número de Faixas do Projeto" min="1" value="1">
                     </div>
 
-                    <input type="url" id="link_capa" placeholder="Link Direto da Capa (do Postimages)" required>
-                    <input type="url" id="link_arquivo" placeholder="Link da Música no Archive.org (Link Principal)" required>
-                    <button type="submit">Enviar para Análise 🚀</button>
+                    <input type="url" id="link_capa" placeholder="Link da Imagem/Capa/Banner (do Postimages)" required>
+                    <input type="url" id="link_arquivo" placeholder="Link do MP3 (Archive) ou Vídeo (YouTube)" required>
+                    <button type="submit">Enviar para Aprovação 🚀</button>
                 </form>
             </div>
         </div>
 
+        <!-- PAINEL DE CONTROLE -->
         <div class="box">
             <h2>📊 Controle Geral e Moderação</h2>
             <div class="stats-box">
-                <div class="stat-card"><h3>2,941</h3><p>Visualizações</p></div>
-                <div class="stat-card"><h3 id="stat-projetos">0</h3><p>Músicas no Ar</p></div>
-                <div class="stat-card"><h3 id="stat-artistas">0</h3><p>Pastas Criadas</p></div>
+                <div class="stat-card"><h3>3,412</h3><p>Visualizações</p></div>
+                <div class="stat-card"><h3 id="stat-projetos">0</h3><p>Conteúdos no Ar</p></div>
+                <div class="stat-card"><h3 id="stat-artistas">0</h3><p>Pastas Ativas</p></div>
             </div>
 
-            <h2>📁 Gerenciador de Lançamentos (Lista de Moderação)</h2>
+            <h2>📁 Gerenciador de Lançamentos do Site</h2>
             <div id="lista-gerenciador"></div>
         </div>
     </div>
@@ -112,19 +118,20 @@
             const categoria = document.getElementById("categoria_artista").value;
             const bio = document.getElementById("bio_artista").value;
 
-            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v3") || "[]");
+            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v4") || "[]");
             artistas.push({ id: Date.now().toString(), nome, categoria, bio });
-            localStorage.setItem("edp_artistas_v3", JSON.stringify(artistas));
+            localStorage.setItem("edp_artistas_v4", JSON.stringify(artistas));
 
+            alert("Pasta virtual para '" + nome + "' criada com sucesso! Já pode selecioná-la abaixo.");
             this.reset();
             atualizarSelecaoArtistas();
-            exibirItensGerenciador();
         });
 
         function atualizarSelecaoArtistas() {
             const select = document.getElementById("artista_venculo");
-            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v3") || "[]");
-            select.innerHTML = '<option value="EDPMUZIK">EDPMUZIK (Principal)</option>';
+            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v4") || "[]");
+            
+            select.innerHTML = '<option value="EDPMUZIK">EDPMUZIK (Pasta Principal)</option>';
             artistas.forEach(art => {
                 select.innerHTML += `<option value="${art.nome}">${art.nome} (${art.categoria})</option>`;
             });
@@ -134,7 +141,14 @@
             e.preventDefault();
             const nomeArt = document.getElementById("artista_venculo").value;
             const tipo = document.getElementById("tipo_projeto").value;
-            const faixas = (tipo === "Música Solo") ? "1" : document.getElementById("num_faixas").value;
+            const faixas = (tipo === "EP" || tipo === "Mixtape" || tipo === "Álbum") ? document.getElementById("num_faixas").value : "1";
+
+            let arquivoUrl = document.getElementById("link_arquivo").value;
+            if(arquivoUrl.includes("://youtube.com")) {
+                arquivoUrl = arquivoUrl.replace("watch?v=", "embed/");
+            } else if(arquivoUrl.includes("youtu.be/")) {
+                arquivoUrl = arquivoUrl.replace("youtu.be/", "://youtube.com");
+            }
 
             const novoItem = {
                 id: Date.now().toString(),
@@ -143,14 +157,15 @@
                 tipo: tipo,
                 faixas: faixas,
                 capa_url: document.getElementById("link_capa").value,
-                arquivo_url: document.getElementById("link_arquivo").value,
-                aprovado: false // Começa como FALSO (Pendente) para aprovar depois
+                arquivo_url: arquivoUrl,
+                aprovado: false
             };
 
-            let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
+            let banco = JSON.parse(localStorage.getItem("edp_banco_v4") || "[]");
             banco.unshift(novoItem);
-            localStorage.setItem("edp_banco_v3", JSON.stringify(banco));
+            localStorage.setItem("edp_banco_v4", JSON.stringify(banco));
 
+            alert("Submetido! Use o botão verde ao lado para aprovar.");
             this.reset();
             verificarTipo();
             exibirItensGerenciador();
@@ -158,27 +173,8 @@
 
         function exibirItensGerenciador() {
             const lista = document.getElementById("lista-gerenciador");
-            let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
-            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v3") || "[]");
+            let banco = JSON.parse(localStorage.getItem("edp_banco_v4") || "[]");
+            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v4") || "[]");
 
-            // Conta apenas os que estão aprovados para a estatística
             const aprovadosCount = banco.filter(i => i.aprovado === true).length;
             document.getElementById("stat-projetos").innerText = aprovadosCount;
-            document.getElementById("stat-artistas").innerText = artistas.length;
-            lista.innerHTML = "";
-
-            if (banco.length === 0) {
-                lista.innerHTML = "<p style='color:#666; text-align:center;'>Nenhum projeto postado.</p>";
-                return;
-            }
-
-            banco.forEach(item => {
-                const statusTexto = item.aprovado ? "No Ar 🟢" : "Pendente 🟠";
-                const statusClasse = item.aprovado ? "status-aprovado" : "status-pendente";
-                
-                lista.innerHTML += `
-                    <div class="item-lista">
-                        <div class="item-topo">
-                            <div style="display:flex; align-items:center;">
-                                <img src="${item.capa_url}">
-                                <div>
