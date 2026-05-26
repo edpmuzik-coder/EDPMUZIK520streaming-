@@ -2,137 +2,176 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>EDPMUZIK - Streaming</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDPMUZIK - Plataforma de Streaming</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; margin: 0; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .card { background: #252525; padding: 15px; border-radius: 6px; text-align: center; }
-        .card img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 4px; }
-        .btn-action { background: #ff5500; border: none; color: white; padding: 5px 10px; margin: 5px; cursor: pointer; border-radius: 4px; }
-        .suporte { background: #333; padding: 20px; margin-top: 40px; border-radius: 6px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #ff5500; text-transform: uppercase; font-size: 2em; letter-spacing: 1px; }
+        h2, h3 { color: #fff; }
+        
+        /* Filtros de Navegação estilo SoundCloud */
+        .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #2d2d2d; }
+        .btn-filter { background: #222; color: #fff; border: 1px solid #444; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-filter:hover, .btn-filter.active { background: #ff5500; border-color: #ff5500; }
+        
+        /* Grid de Músicas */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 25px; }
+        .card { background: #1a1a1a; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #2d2d2d; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(255,85,0,0.2); }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 6px; background: #222; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        .card h3 { margin: 12px 0 5px 0; font-size: 1.1em; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card p { margin: 0 0 10px 0; color: #aaa; font-size: 0.9em; }
+        
+        /* Contadores visíveis para os visitantes */
+        .metrics { display: flex; justify-content: center; gap: 10px; font-size: 0.8em; color: #888; margin: 10px 0; background: #222; padding: 5px; border-radius: 4px; }
+        
+        /* Botões de Ação */
+        .btn-action { background: #ff5500; border: none; color: white; padding: 8px 12px; margin: 4px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 0.85em; transition: 0.2s; }
+        .btn-action:hover { background: #ff7733; }
+        .btn-bio { background: #444; }
+        .btn-bio:hover { background: #555; }
+        
+        /* Rodapé e Seção de Suporte Técnico */
+        .suporte { background: #1a1a1a; padding: 30px; margin-top: 50px; border-radius: 8px; border: 1px solid #2d2d2d; }
+        .suporte-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media(max-width: 768px) { .suporte-grid { grid-template-columns: 1fr; } }
+        .info-contacto p { font-size: 1.1em; margin: 10px 0; color: #ccc; }
+        .info-contacto strong { color: #ff5500; }
+        .form-suporte input, .form-suporte textarea { width: 100%; padding: 12px; margin: 6px 0; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; box-sizing: border-box; }
+        .form-suporte button { background: #00b359; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; text-transform: uppercase; }
+        .form-suporte button:hover { background: #00cc66; }
     </style>
 </head>
 <body>
 
-    <h1>EDPMUZIK - Plataforma de Streaming</h1>
-    
-    <!-- Filtros de Navegação -->
-    <div style="margin-bottom: 20px;">
-        <button class="btn-action" onclick="filtrar('Todos')">Todos</button>
-        <button class="btn-action" onclick="filtrar('Album')">Álbuns</button>
-        <button class="btn-action" onclick="filtrar('EP')">EPs</button>
-        <button class="btn-action" onclick="filtrar('Mixtape')">Mixtapes</button>
-    </div>
+    <div class="container">
+        <h1>EDPMUZIK - Streaming</h1>
+        
+        <!-- Barra de Filtros por Pastas/Projetos -->
+        <div class="filter-bar" id="barra-filtros">
+            <button class="btn-filter active" onclick="filtrarConteudo('Todos', this)">Todos os Projetos</button>
+            <button class="btn-filter" onclick="filtrarConteudo('Música Solo', this)">Músicas Solo</button>
+        </div>
 
-    <!-- Lista de Músicas -->
-    <div class="grid" id="player-publico"></div>
+        <!-- Músicas Online -->
+        <h2>Músicas e Lançamentos Públicos</h2>
+        <div class="grid" id="lista-publica">
+            <p style="color: #666;">A carregar músicas do servidor...</p>
+        </div>
 
-    <!-- Área de Suporte Técnico Requisitada -->
-    <div class="suporte">
-        <h2>Contacto e Suporte Técnico</h2>
-        <p>📞 Terminal Telefónico: <strong>926008439</strong></p>
-        <p>📧 Correio Eletrónico: <strong>edpmuzik@gmail.com</strong></p>
-        <hr>
-        <h3>Enviar Mensagem Direta</h3>
-        <input type="text" id="msgNome" placeholder="Seu Nome" style="width:100%; padding:8px; margin:5px 0;"><br>
-        <textarea id="msgTexto" placeholder="Escreva a sua mensagem para o suporte..." rows="4" style="width:100%; padding:8px; margin:5px 0;"></textarea><br>
-        <button class="btn-action" onclick="enviarSuporte()">Enviar Mensagem</button>
+        <!-- Seção de Contacto e Suporte Técnico Obrigatória -->
+        <div class="suporte">
+            <h2>Contacto & Suporte Técnico</h2>
+            <div class="suporte-grid">
+                <div class="info-contacto">
+                    <p>Fale diretamente com a administração da nossa produtora para suporte técnico ou informações de lançamento.</p>
+                    <p>📞 Terminal Telefónico: <strong>926008439</strong></p>
+                    <p>📧 Correio Eletrónico: <strong>edpmuzik@gmail.com</strong></p>
+                </div>
+                <div class="form-suporte">
+                    <h3>Enviar Mensagem ao Suporte</h3>
+                    <input type="text" id="supNome" placeholder="Seu Nome Completo">
+                    <input type="email" id="supEmail" placeholder="Seu Correio Eletrónico">
+                    <textarea id="supMensagem" rows="3" placeholder="Escreva a sua dúvida ou reclamação aqui..."></textarea>
+                    <button type="button" onclick="enviarSuporte()">Enviar Mensagem</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        let publicado = JSON.parse(localStorage.getItem('edp_publicado')) || [];
+        const API_URL = '/api/store';
+        let todasAsMusicas = [];
 
-        function renderPublico(itens) {
-            const container = document.getElementById('player-publico');
-            container.innerHTML = '';
+        // Carrega as músicas e as pastas de forma dinâmica da base de dados Firebase via API Vercel
+        async function inicializarSite() {
+            try {
+                // 1. Buscar Músicas
+                const resMusicas = await fetch(`${API_URL}?acao=get_banco`);
+                todasAsMusicas = await resMusicas.json() || [];
 
-            if(itens.length === 0) {
-                container.innerHTML = '<p>Nenhuma música publicada ainda.</p>';
+                // 2. Buscar Pastas criadas para gerar os botões de filtro automáticos
+                const resPastas = await fetch(`${API_URL}?acao=get_artistas`);
+                const pastas = await resPastas.json() || [];
+
+                gerarBotoesFiltro(pastas);
+                renderizarMusicas(todasAsMusicas);
+            } catch (err) {
+                document.getElementById('lista-publica').innerHTML = '<p style="color: red;">Erro ao ligar ao servidor de streaming.</p>';
+            }
+        }
+
+        function gerarBotoesFiltro(pastas) {
+            const barra = document.getElementById('barra-filtros');
+            // Mantém os filtros fixos iniciais e injeta as pastas criadas no admin
+            barra.innerHTML = `
+                <button class="btn-filter active" onclick="filtrarConteudo('Todos', this)">Todos os Projetos</button>
+                <button class="btn-filter" onclick="filtrarConteudo('Música Solo', this)">Músicas Solo</button>
+            `;
+            pastas.forEach(p => {
+                barra.innerHTML += `<button class="btn-filter" onclick="filtrarConteudo('${p.nome}', this)">📁 ${p.nome}</button>`;
+            });
+        }
+
+        function renderizarMusicas(lista) {
+            const container = document.getElementById('lista-publica');
+            if (lista.length === 0) {
+                container.innerHTML = '<p style="color: #666; width: 100%;">Nenhuma música publicada nesta categoria até ao momento.</p>';
                 return;
             }
 
-            itens.forEach(item => {
+            container.innerHTML = '';
+            lista.forEach(item => {
                 container.innerHTML += `
                     <div class="card">
-                        <img src="${item.linkCapa}" alt="Capa">
+                        <img src="${item.linkCapa}" onerror="this.src='https://placehold.co'">
                         <h3>${item.titulo}</h3>
-                        <p><strong>Músico:</strong> ${item.artista}</p>
-                        <p><small>Projeto: ${item.tipoProjeto} (${item.tipoArtista})</small></p>
+                        <p>${item.artista}</p>
                         
-                        <!-- Áudio Player -->
-                        <audio src="${item.linkAudio}" controls style="width:100%;" onplay="contarStream(${item.id})"></audio>
+                        <!-- Reprodutor de Áudio Integrado -->
+                        <audio src="${item.linkAudio}" controls style="width: 100%; height: 32px;" onplay="contarMetrica(${item.id}, 'streams')"></audio>
                         
-                        <!-- Métricas em Tempo Real -->
-                        <div style="margin: 10px 0; font-size: 0.9em; color: #aaa;">
-                            👁️ Streams: <span id="stream-${item.id}">${item.streams}</span> | 
-                            📥 Downloads: <span id="down-${item.id}">${item.downloads}</span> | 
-                            ❤️ Gostos: <span id="gosto-${item.id}">${item.gostos}</span>
+                        <!-- Métricas Públicas Requisitadas -->
+                        <div class="metrics">
+                            <span>👁️ ${item.streams || 0}</span> | 
+                            <span>📥 <span id="down-count-${item.id}">${item.downloads || 0}</span></span> | 
+                            <span>❤️ <span id="like-count-${item.id}">${item.gostos || 0}</span></span>
                         </div>
 
-                        <!-- Botões de Interação -->
-                        <button class="btn-action" onclick="contarGosto(${item.id})">❤️ Gostrar</button>
-                        <button class="btn-action" onclick="fazerDownload('${item.linkAudio}', ${item.id})">📥 Baixar MP3</button>
-                        <button class="btn-action" onclick="alert('Biografia: ${item.biografia || "Não informada"}')">👤 Bio</button>
+                        <button class="btn-action" onclick="contarMetrica(${item.id}, 'gostos')">❤️ Gosto</button>
+                        <a href="${item.linkAudio}" target="_blank" onclick="contarMetrica(${item.id}, 'downloads')">
+                            <button class="btn-action">📥 Baixar</button>
+                        </a>
+                        <button class="btn-action btn-bio" onclick="mostrarBio('${item.artista}', '${item.biografia || "Sem biografia cadastrada."}')">👤 Bio</button>
                     </div>
                 `;
             });
         }
 
-        function contarStream(id) {
-            publicado = publicado.map(item => {
-                if(item.id === id) {
-                    item.streams += 1;
-                    document.getElementById(`stream-${id}`).innerText = item.streams;
-                }
-                return item;
-            });
-            localStorage.setItem('edp_publicado', JSON.stringify(publicado));
-        }
+        function filtrarConteudo(categoria, botao) {
+            // Alterar estado ativo do botão de filtro
+            document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+            botao.classList.add('active');
 
-        function contarGosto(id) {
-            publicado = publicado.map(item => {
-                if(item.id === id) {
-                    item.gostos += 1;
-                    document.getElementById(`gosto-${id}`).innerText = item.gostos;
-                }
-                return item;
-            });
-            localStorage.setItem('edp_publicado', JSON.stringify(publicado));
-        }
-
-        function fazerDownload(url, id) {
-            publicado = publicado.map(item => {
-                if(item.id === id) {
-                    item.downloads += 1;
-                    document.getElementById(`down-${id}`).innerText = item.downloads;
-                }
-                return item;
-            });
-            localStorage.setItem('edp_publicado', JSON.stringify(publicado));
-            window.open(url, '_blank');
-        }
-
-        function filtrar(tipo) {
-            if(tipo === 'Todos') {
-                renderPublico(publicado);
+            if (categoria === 'Todos') {
+                renderizarMusicas(todasAsMusicas);
             } else {
-                const filtrados = publicado.filter(item => item.tipoProjeto === tipo);
-                renderPublico(filtrados);
+                const filtradas = todasAsMusicas.filter(m => m.tipoProjeto === categoria);
+                renderizarMusicas(filtradas);
             }
         }
 
-        function enviarSuporte() {
-            const nome = document.getElementById('msgNome').value;
-            const texto = document.getElementById('msgTexto').value;
-            if(!nome || !texto) return alert('Preencha os campos de mensagem.');
-            
-            alert(`Mensagem enviada com sucesso para edpmuzik@gmail.com!\n\nDe: ${nome}\nConteúdo: ${texto}`);
-            document.getElementById('msgNome').value = '';
-            document.getElementById('msgTexto').value = '';
-        }
+        async function contarMetrica(id, tipo) {
+            todasAsMusicas = todasAsMusicas.map(item => {
+                if (item.id === id) {
+                    item[tipo] = (item[tipo] || 0) + 1;
+                    // Atualiza a tela de imediato
+                    if(tipo === 'gostos' && document.getElementById(`like-count-${id}`)) document.getElementById(`like-count-${id}`).innerText = item[tipo];
+                    if(tipo === 'downloads' && document.getElementById(`down-count-${id}`)) document.getElementById(`down-count-${id}`).innerText = item[tipo];
+                }
+                return item;
+            });
 
-        // Inicializar a exibição
-        renderPublico(publicado);
-    </script>
-</body>
-</html>
+            // Envia e salva de forma definitiva a nova contagem no Firebase
+            await fetch(API_URL, {
