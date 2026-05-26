@@ -2,121 +2,137 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Administrativo - EDPMUZIK</title>
+    <title>EDPMUZIK - Streaming</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #111; color: #fff; padding: 20px; }
-        .box { background: #222; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        input, select, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 4px; border: none; }
-        button { background: #ff5500; color: white; font-weight: bold; cursor: pointer; }
-        button.update-btn { background: #00b359; font-size: 1.2em; margin-top: 20px; }
-        .preview-card { background: #333; padding: 10px; margin: 5px 0; border-left: 5px solid #ff5500; }
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; margin: 0; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: #252525; padding: 15px; border-radius: 6px; text-align: center; }
+        .card img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 4px; }
+        .btn-action { background: #ff5500; border: none; color: white; padding: 5px 10px; margin: 5px; cursor: pointer; border-radius: 4px; }
+        .suporte { background: #333; padding: 20px; margin-top: 40px; border-radius: 6px; }
     </style>
 </head>
 <body>
 
-    <h1>Painel de Controle Administrativo</h1>
+    <h1>EDPMUZIK - Plataforma de Streaming</h1>
     
-    <!-- Estatísticas de Monitorização -->
-    <div class="box">
-        <h2>Monitorização em Tempo Real</h2>
-        <p>Total de Músicas (Rascunho): <span id="count-musicas">0</span></p>
-        <p>Total de Pastas/Projetos: <span id="count-pastas">0</span></p>
+    <!-- Filtros de Navegação -->
+    <div style="margin-bottom: 20px;">
+        <button class="btn-action" onclick="filtrar('Todos')">Todos</button>
+        <button class="btn-action" onclick="filtrar('Album')">Álbuns</button>
+        <button class="btn-action" onclick="filtrar('EP')">EPs</button>
+        <button class="btn-action" onclick="filtrar('Mixtape')">Mixtapes</button>
     </div>
 
-    <!-- Formulário de Upload por Link -->
-    <div class="box">
-        <h2>Subir Novo Conteúdo (Via Link)</h2>
-        <input type="text" id="titulo" placeholder="Título da Música/Vídeo">
-        <input type="text" id="artista" placeholder="Nome do Músico">
-        
-        <select id="tipoArtista">
-            <option value="Produtora">Músico da Produtora</option>
-            <option value="Colaborador">Músico Colaborador</option>
-            <option value="Independente">Músico Independente</option>
-        </select>
+    <!-- Lista de Músicas -->
+    <div class="grid" id="player-publico"></div>
 
-        <select id="tipoProjeto">
-            <option value="Solo">Música Solo</option>
-            <option value="EP">EP</option>
-            <option value="Mixtape">MIXTAPE</option>
-            <option value="Album">ÁLBUM</option>
-        </select>
-
-        <input type="text" id="linkAudio" placeholder="Link do Áudio (Ex: https://archive.org)">
-        <input type="text" id="linkCapa" placeholder="Link da Capa (Ex: https://postimg.cc/...)">
-        <input type="text" id="linkYoutube" placeholder="Link do Vídeo de Publicidade (YouTube) se houver">
-        <textarea id="biografia" placeholder="Biografia do Músico" rows="3" style="width:100%;"></textarea>
-        
-        <button onclick="adicionarRascunho()">Adicionar ao Rascunho para Teste</button>
+    <!-- Área de Suporte Técnico Requisitada -->
+    <div class="suporte">
+        <h2>Contacto e Suporte Técnico</h2>
+        <p>📞 Terminal Telefónico: <strong>926008439</strong></p>
+        <p>📧 Correio Eletrónico: <strong>edpmuzik@gmail.com</strong></p>
+        <hr>
+        <h3>Enviar Mensagem Direta</h3>
+        <input type="text" id="msgNome" placeholder="Seu Nome" style="width:100%; padding:8px; margin:5px 0;"><br>
+        <textarea id="msgTexto" placeholder="Escreva a sua mensagem para o suporte..." rows="4" style="width:100%; padding:8px; margin:5px 0;"></textarea><br>
+        <button class="btn-action" onclick="enviarSuporte()">Enviar Mensagem</button>
     </div>
-
-    <!-- Área de Monitorização e Pré-visualização -->
-    <div class="box">
-        <h2>Área de Teste (Ouvir e Assistir Antes de Publicar)</h2>
-        <div id="lista-rascunhos"></div>
-    </div>
-
-    <!-- Botão de Atualização Crítica -->
-    <button class="update-btn" onclick="atualizarPaginaInicial()">🔄 ATUALIZAR PARA A PÁGINA INICIAL</button>
 
     <script>
-        let rascunhos = JSON.parse(localStorage.getItem('edp_rascunhos')) || [];
+        let publicado = JSON.parse(localStorage.getItem('edp_publicado')) || [];
 
-        function atualizarContadores() {
-            document.getElementById('count-musicas').innerText = rascunhos.length;
-            let pastas = [...new Set(rascunhos.map(item => item.tipoProjeto))];
-            document.getElementById('count-pastas').innerText = pastas.length;
-        }
-
-        function adicionarRascunho() {
-            const novoItem = {
-                id: Date.now(),
-                titulo: document.getElementById('titulo').value,
-                artista: document.getElementById('artista').value,
-                tipoArtista: document.getElementById('tipoArtista').value,
-                tipoProjeto: document.getElementById('tipoProjeto').value,
-                linkAudio: document.getElementById('linkAudio').value,
-                linkCapa: document.getElementById('linkCapa').value,
-                linkYoutube: document.getElementById('linkYoutube').value,
-                biografia: document.getElementById('biografia').value,
-                streams: 0,
-                downloads: 0,
-                gostos: 0,
-                comentarios: []
-            };
-
-            rascunhos.push(novoItem);
-            localStorage.setItem('edp_rascunhos', JSON.stringify(rascunhos));
-            renderRascunhos();
-            atualizarContadores();
-            alert('Item adicionado à área de monitorização!');
-        }
-
-        function renderRascunhos() {
-            const container = document.getElementById('lista-rascunhos');
+        function renderPublico(itens) {
+            const container = document.getElementById('player-publico');
             container.innerHTML = '';
-            rascunhos.forEach(item => {
+
+            if(itens.length === 0) {
+                container.innerHTML = '<p>Nenhuma música publicada ainda.</p>';
+                return;
+            }
+
+            itens.forEach(item => {
                 container.innerHTML += `
-                    <div class="preview-card">
-                        <h3>${item.titulo} - ${item.artista} (${item.tipoProjeto})</h3>
-                        <p><strong>Categoria:</strong> ${item.tipoArtista}</p>
-                        <img src="${item.linkCapa}" width="60" style="border-radius:4px;"><br>
-                        <audio src="${item.linkAudio}" controls style="margin-top:5px;"></audio>
-                        ${item.linkYoutube ? `<br><small>Link YouTube: ${item.linkYoutube}</small>` : ''}
+                    <div class="card">
+                        <img src="${item.linkCapa}" alt="Capa">
+                        <h3>${item.titulo}</h3>
+                        <p><strong>Músico:</strong> ${item.artista}</p>
+                        <p><small>Projeto: ${item.tipoProjeto} (${item.tipoArtista})</small></p>
+                        
+                        <!-- Áudio Player -->
+                        <audio src="${item.linkAudio}" controls style="width:100%;" onplay="contarStream(${item.id})"></audio>
+                        
+                        <!-- Métricas em Tempo Real -->
+                        <div style="margin: 10px 0; font-size: 0.9em; color: #aaa;">
+                            👁️ Streams: <span id="stream-${item.id}">${item.streams}</span> | 
+                            📥 Downloads: <span id="down-${item.id}">${item.downloads}</span> | 
+                            ❤️ Gostos: <span id="gosto-${item.id}">${item.gostos}</span>
+                        </div>
+
+                        <!-- Botões de Interação -->
+                        <button class="btn-action" onclick="contarGosto(${item.id})">❤️ Gostrar</button>
+                        <button class="btn-action" onclick="fazerDownload('${item.linkAudio}', ${item.id})">📥 Baixar MP3</button>
+                        <button class="btn-action" onclick="alert('Biografia: ${item.biografia || "Não informada"}')">👤 Bio</button>
                     </div>
                 `;
             });
         }
 
-        function atualizarPaginaInicial() {
-            // Transfere o rascunho aprovado para a base de dados pública do site
-            localStorage.setItem('edp_publicado', JSON.stringify(rascunhos));
-            alert('Sucesso! Todo o conteúdo foi publicado na Página Inicial dos Ouvintes.');
+        function contarStream(id) {
+            publicado = publicado.map(item => {
+                if(item.id === id) {
+                    item.streams += 1;
+                    document.getElementById(`stream-${id}`).innerText = item.streams;
+                }
+                return item;
+            });
+            localStorage.setItem('edp_publicado', JSON.stringify(publicado));
         }
 
-        // Inicializar
-        renderRascunhos();
-        atualizarContadores();
+        function contarGosto(id) {
+            publicado = publicado.map(item => {
+                if(item.id === id) {
+                    item.gostos += 1;
+                    document.getElementById(`gosto-${id}`).innerText = item.gostos;
+                }
+                return item;
+            });
+            localStorage.setItem('edp_publicado', JSON.stringify(publicado));
+        }
+
+        function fazerDownload(url, id) {
+            publicado = publicado.map(item => {
+                if(item.id === id) {
+                    item.downloads += 1;
+                    document.getElementById(`down-${id}`).innerText = item.downloads;
+                }
+                return item;
+            });
+            localStorage.setItem('edp_publicado', JSON.stringify(publicado));
+            window.open(url, '_blank');
+        }
+
+        function filtrar(tipo) {
+            if(tipo === 'Todos') {
+                renderPublico(publicado);
+            } else {
+                const filtrados = publicado.filter(item => item.tipoProjeto === tipo);
+                renderPublico(filtrados);
+            }
+        }
+
+        function enviarSuporte() {
+            const nome = document.getElementById('msgNome').value;
+            const texto = document.getElementById('msgTexto').value;
+            if(!nome || !texto) return alert('Preencha os campos de mensagem.');
+            
+            alert(`Mensagem enviada com sucesso para edpmuzik@gmail.com!\n\nDe: ${nome}\nConteúdo: ${texto}`);
+            document.getElementById('msgNome').value = '';
+            document.getElementById('msgTexto').value = '';
+        }
+
+        // Inicializar a exibição
+        renderPublico(publicado);
     </script>
 </body>
 </html>
