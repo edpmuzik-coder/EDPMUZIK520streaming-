@@ -33,7 +33,6 @@
 
     <div class="grid-admin">
         <div>
-            <!-- FORMULÁRIO 1: CRIAR PASTA VIRTUAL -->
             <div class="box">
                 <h2>📁 Criar Pasta de Artista / Colaborador</h2>
                 <form id="form-artista">
@@ -45,22 +44,17 @@
                         <option value="Produtor">Produtores (Beats)</option>
                         <option value="Anunciante">Anunciante (Publicidade)</option>
                     </select>
-                    <textarea id="bio_artista" placeholder="Biografia do artista ou notas da publicidade..." rows="2" required></textarea>
-                    <button type="submit" id="btn-criar-pasta" style="background:#444;">Criar / Registrar Pasta 📁</button>
+                    <textarea id="bio_artista" placeholder="Biografia do artista..." rows="2" required></textarea>
+                    <button type="submit" style="background:#444;">Criar / Registrar Pasta 📁</button>
                 </form>
             </div>
 
-            <!-- FORMULÁRIO 2: PUBLICAR NO SITE -->
             <div class="box">
                 <h2>🚀 Publicar no Site (Música, Vídeo ou Banner)</h2>
                 <form id="form-upload">
                     <input type="text" id="titulo" placeholder="Título do Conteúdo" required>
-                    
                     <label style="font-size:12px; color:#aaa;">Escolher uma Pasta Já Existente:</label>
-                    <select id="artista_venculo" class="seletor-dinamico" required>
-                        <option value="EDPMUZIK">EDPMUZIK (Pasta Principal)</option>
-                    </select>
-
+                    <select id="artista_venculo" class="seletor-dinamico" required></select>
                     <select id="tipo_projeto" onchange="verificarTipo()">
                         <option value="Música Solo">Música Solo / Single</option>
                         <option value="EP">Projeto: EP</option>
@@ -70,19 +64,16 @@
                         <option value="Banner Publicidade">Banner de Publicidade (Foto)</option>
                         <option value="Vídeo Publicidade">Vídeo de Publicidade</option>
                     </select>
-
                     <div id="campo-faixas" style="display:none;">
                         <input type="number" id="num_faixas" placeholder="Número de Faixas do Projeto" min="1" value="1">
                     </div>
-
-                    <input type="url" id="link_capa" placeholder="Link da Imagem/Capa/Banner (do Postimages)" required>
+                    <input type="url" id="link_capa" placeholder="Link da Capa/Banner (Postimages)" required>
                     <input type="url" id="link_arquivo" placeholder="Link do MP3 (Archive) ou Vídeo (YouTube)" required>
                     <button type="submit">Enviar para Aprovação 🚀</button>
                 </form>
             </div>
         </div>
 
-        <!-- PAINEL DE CONTROLE -->
         <div class="box">
             <h2>📊 Controle Geral e Moderação</h2>
             <div class="stats-box">
@@ -90,96 +81,96 @@
                 <div class="stat-card"><h3 id="stat-projetos">0</h3><p>Conteúdos no Ar</p></div>
                 <div class="stat-card"><h3 id="stat-artistas">0</h3><p>Pastas Ativas</p></div>
             </div>
-
             <h2>📁 Gerenciador de Lançamentos do Site</h2>
             <div id="lista-gerenciador"></div>
         </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            atualizarSelecaoArtistas();
-            exibirItensGerenciador();
+        // Sincronização direta com a API estável de armazenamento
+        async function chamarAPI(acao, dados = {}) {
+            try {
+                const res = await fetch('/api/store', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ acao, dados })
+                });
+                return await res.json();
+            } catch (e) {
+                // Fallback de contingência caso o deploy da API demore
+                let local = JSON.parse(localStorage.getItem("edp_" + acao) || "[]");
+                if(dados.id) { local.unshift(dados); localStorage.setItem("edp_" + acao, JSON.stringify(local)); }
+                return local;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await atualizarSelecaoArtistas();
+            await exibirItensGerenciador();
         });
 
         function verificarTipo() {
             const tipo = document.getElementById("tipo_projeto").value;
             const campo = document.getElementById("campo-faixas");
-            if (tipo === "EP" || tipo === "Mixtape" || tipo === "Álbum") {
-                campo.style.display = "block";
-            } else {
-                campo.style.display = "none";
-            }
+            campo.style.display = (tipo === "EP" || tipo === "Mixtape" || tipo === "Álbum") ? "block" : "none";
         }
 
-        // LÓGICA DE CRIAR PASTA CORRIGIDA SEM CONFLITOS
-        document.getElementById("form-artista").addEventListener("submit", function(e) {
+        document.getElementById("form-artista").addEventListener("submit", async function(e) {
             e.preventDefault();
             const nome = document.getElementById("nome_artista").value.trim();
             const categoria = document.getElementById("categoria_artista").value;
             const bio = document.getElementById("bio_artista").value;
 
-            if(!nome) return;
-
-            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v5") || "[]");
-            
-            // Evita criar pastas com o mesmo nome
-            if(artistas.some(a => a.nome.toLowerCase() === nome.toLowerCase())) {
-                alert("Já existe uma pasta com este nome!");
-                return;
-            }
-
-            artistas.push({ id: Date.now().toString(), nome, categoria, bio });
-            localStorage.setItem("edp_artistas_v5", JSON.stringify(artistas));
-
-            alert("Pasta para '" + nome + "' criada! Já pode selecioná-la no menu abaixo.");
+            await chamarAPI('artistas', { id: Date.now().toString(), nome, categoria, bio });
+            alert("Pasta para '" + nome + "' registrada!");
             this.reset();
-            atualizarSelecaoArtistas();
-            exibirItensGerenciador();
+            await atualizarSelecaoArtistas();
         });
 
-        function atualizarSelecaoArtistas() {
+        async function atualizarSelecaoArtistas() {
             const select = document.getElementById("artista_venculo");
-            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v5") || "[]");
-            
+            let artistas = await chamarAPI('get_artistas');
             select.innerHTML = '<option value="EDPMUZIK">EDPMUZIK (Pasta Principal)</option>';
             artistas.forEach(art => {
                 select.innerHTML += `<option value="${art.nome}">${art.nome} (${art.categoria})</option>`;
             });
         }
 
-        // ENVIAR LANÇAMENTOS
-        document.getElementById("form-upload").addEventListener("submit", function(e) {
+        document.getElementById("form-upload").addEventListener("submit", async function(e) {
             e.preventDefault();
-            const nomeArt = document.getElementById("artista_venculo").value;
-            const tipo = document.getElementById("tipo_projeto").value;
-            const faixas = (tipo === "EP" || tipo === "Mixtape" || tipo === "Álbum") ? document.getElementById("num_faixas").value : "1";
-
             let arquivoUrl = document.getElementById("link_arquivo").value;
-            if(arquivoUrl.includes("://youtube.com")) {
-                arquivoUrl = arquivoUrl.replace("watch?v=", "embed/");
-            } else if(arquivoUrl.includes("youtu.be/")) {
-                arquivoUrl = arquivoUrl.replace("youtu.be/", "://youtube.com");
-            }
+            if(arquivoUrl.includes("://youtube.com")) arquivoUrl = arquivoUrl.replace("watch?v=", "embed/");
+            if(arquivoUrl.includes("youtu.be/")) arquivoUrl = arquivoUrl.replace("youtu.be/", "://youtube.com");
 
             const novoItem = {
                 id: Date.now().toString(),
                 titulo: document.getElementById("titulo").value,
-                artista: nomeArt,
-                tipo: tipo,
-                faixas: faixas,
+                artista: document.getElementById("artista_venculo").value,
+                tipo: document.getElementById("tipo_projeto").value,
+                faixas: document.getElementById("num_faixas").value || "1",
                 capa_url: document.getElementById("link_capa").value,
                 arquivo_url: arquivoUrl,
                 aprovado: false
             };
 
-            let banco = JSON.parse(localStorage.getItem("edp_banco_v5") || "[]");
-            banco.unshift(novoItem);
-            localStorage.setItem("edp_banco_v5", JSON.stringify(banco));
-
-            alert("Conteúdo enviado com sucesso! Clique em 'Aprovar' na lista ao lado para colocar no site.");
+            await chamarAPI('banco', novoItem);
+            alert("Submetido com sucesso!");
             this.reset();
             verificarTipo();
-            exibirItensGerenciador();
+            await exibirItensGerenciador();
         });
+
+        async function exibirItensGerenciador() {
+            const lista = document.getElementById("lista-gerenciador");
+            let banco = await chamarAPI('get_banco');
+            let artistas = await chamarAPI('get_artistas');
+
+            document.getElementById("stat-projetos").innerText = banco.filter(i => i.aprovado).length;
+            document.getElementById("stat-artistas").innerText = artistas.length + 1;
+            lista.innerHTML = "";
+
+            if (banco.length === 0) {
+                lista.innerHTML = "<p style='color:#666; text-align:center;'>Nenhum item pendente.</p>";
+                return;
+            }
 
