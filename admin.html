@@ -5,197 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - EDPMUZIK</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #fff; padding: 20px; margin: 0; }
-        .container { max-width: 1100px; margin: 0 auto; }
-        h1, h2, h3 { color: #ff5500; }
+        body { font-family: sans-serif; background: #111; color: #fff; padding: 20px; }
         .box { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; box-sizing: border-box; }
-        input:focus, select:focus, textarea:focus { border-color: #ff5500; outline: none; }
-        button { background: #ff5500; color: white; font-weight: bold; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.3s; }
-        button:hover { background: #ff7733; }
-        .update-btn { background: #00b359; font-size: 1.3em; margin: 20px 0; padding: 15px; }
-        .update-btn:hover { background: #00cc66; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .stat-card { background: #222; padding: 15px; border-radius: 6px; text-align: center; border-bottom: 4px solid #ff5500; }
-        .stat-card h3 { margin: 0; font-size: 1.8em; color: #fff; }
-        .stat-card p { margin: 5px 0 0 0; color: #aaa; font-size: 0.9em; }
-        .preview-card { background: #222; padding: 15px; margin: 10px 0; border-radius: 6px; border-left: 5px solid #ff5500; display: flex; gap: 15px; align-items: center; }
-        .preview-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; background: #333; }
-        .preview-info { flex-grow: 1; }
-        .preview-info h4 { margin: 0 0 5px 0; font-size: 1.2em; }
-        .preview-info p { margin: 2px 0; color: #ccc; font-size: 0.9em; }
-        .btn-delete { background: #cc0000; padding: 5px 10px; width: auto; font-size: 0.8em; }
-        .btn-delete:hover { background: #ff1a1a; }
-        .folder-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-        .folder-badge { background: #333; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; border: 1px solid #444; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; box-sizing: border-box; }
+        button { background: #ff5500; color: white; font-weight: bold; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; }
+        .update-btn { background: #00b359; font-size: 1.2em; margin-top: 20px; }
+        .folder-badge { background: #333; padding: 8px; margin: 5px; border-radius: 4px; display: inline-block; border-left: 3px solid #ff5500; }
+        .preview-card { background: #222; padding: 10px; margin: 10px 0; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>EDPMUZIK - Painel de Controle de Streaming</h1>
-        <p>Gere os seus artistas, crie pastas de álbuns/EPs e monitorize antes de enviar para o público.</p>
+    <h1>EDPMUZIK - Painel Administrativo</h1>
 
-        <!-- ESTATÍSTICAS -->
-        <div class="box">
-            <h2>Estatísticas Gerais (Painel de Controle)</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3 id="stat-pastas">0</h3>
-                    <p>Pastas Criadas</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="stat-musicas">0</h3>
-                    <p>Músicas no Rascunho</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="stat-publicadas">0</h3>
-                    <p>Músicas Online</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="stat-downloads">0</h3>
-                    <p>Total de Downloads</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid-2">
-            <!-- CRIAR PASTAS -->
-            <div class="box">
-                <h2>1. Criar Nova Pasta (Álbum / EP / Mixtape)</h2>
-                <input type="text" id="nomePasta" placeholder="Nome do Álbum, EP ou Projeto">
-                <select id="categoriaPasta">
-                    <option value="Músico da Produtora">Músico da Produtora</option>
-                    <option value="Músico Colaborador">Músico Colaborador</option>
-                    <option value="Músico Independente">Músico Independente</option>
-                </select>
-                <!-- Botão com trava de segurança para o Vercel -->
-                <button type="button" onclick="criarPasta(event)">📁 Criar Pasta de Projeto</button>
-
-                <h3>Pastas Ativas:</h3>
-                <div id="lista-pastas" class="folder-list"></div>
-            </div>
-
-            <!-- SUBIR MÚSICAS -->
-            <div class="box">
-                <h2>2. Subir Música / Vídeo por Link</h2>
-                <input type="text" id="titulo" placeholder="Título da Música">
-                <input type="text" id="artista" placeholder="Nome do Músico / Artista">
-                
-                <label>Selecionar Pasta / Tipo de Projeto:</label>
-                <select id="selectPasta">
-                    <option value="Música Solo">Música Solo (Sem Pasta)</option>
-                </select>
-
-                <input type="text" id="linkAudio" placeholder="Link do Áudio MP3 (Archive.org)">
-                <input type="text" id="linkCapa" placeholder="Link da Capa da Música (Postimg)">
-                <input type="text" id="linkYoutube" placeholder="Link do Vídeo de Publicidade (YouTube) - Opcional">
-                <textarea id="biografia" placeholder="Biografia curta do músico..." rows="2"></textarea>
-                
-                <!-- Botão com trava de segurança para o Vercel -->
-                <button type="button" onclick="subirMusica(event)">🎵 Carregar para Monitorização</button>
-            </div>
-        </div>
-
-        <!-- ÁREA DE MONITORIZAÇÃO -->
-        <div class="box">
-            <h2>Área de Teste e Monitorização (Ouvir e Assistir Antes de Publicar)</h2>
-            <div id="lista-rascunhos"></div>
-        </div>
-
-        <!-- BOTÃO DE ATUALIZAÇÃO -->
-        <button type="button" class="update-btn" onclick="atualizarPaginaInicial(event)">🔄 ATUALIZAR PARA A PÁGINA INICIAL (ENVIAR PARA OS OUVINTES)</button>
+    <!-- 1. CRIAR PASTAS -->
+    <div class="box">
+        <h2>1. Criar Nova Pasta (Álbum / EP)</h2>
+        <input type="text" id="nomePasta" placeholder="Nome da Pasta">
+        <button type="button" id="btnCriarPasta">📁 Criar Pasta de Projeto</button>
+        
+        <h3>Pastas Criadas:</h3>
+        <div id="lista-pastas"></div>
     </div>
 
-    <!-- O JAVASCRIPT ENTRA AQUI, UNIDO AO HTML -->
+    <!-- 2. SUBIR MÚSICAS -->
+    <div class="box">
+        <h2>2. Subir Música por Link</h2>
+        <input type="text" id="titulo" placeholder="Título">
+        <input type="text" id="artista" placeholder="Músico">
+        
+        <label>Pasta Alvo:</label>
+        <select id="selectPasta">
+            <option value="Música Solo">Música Solo (Sem Pasta)</option>
+        </select>
+
+        <input type="text" id="linkAudio" placeholder="Link do Áudio MP3">
+        <input type="text" id="linkCapa" placeholder="Link da Capa">
+        <button type="button" id="btnSubirMusica">🎵 Carregar para Monitorização</button>
+    </div>
+
+    <!-- 3. ÁREA DE MONITORIZAÇÃO -->
+    <div class="box">
+        <h2>Área de Monitorização</h2>
+        <div id="lista-rascunhos"></div>
+    </div>
+
+    <button type="button" class="update-btn" id="btnPublicar">🔄 ATUALIZAR PARA A PÁGINA INICIAL</button>
+
     <script>
-        let pastas = JSON.parse(localStorage.getItem('edp_pastas')) || [];
-        let rascunhos = JSON.parse(localStorage.getItem('edp_rascunhos')) || [];
-        let publicados = JSON.parse(localStorage.getItem('edp_publicado')) || [];
+        document.addEventListener("DOMContentLoaded", function() {
+            let pastas = JSON.parse(localStorage.getItem('edp_pastas')) || [];
+            let rascunhos = JSON.parse(localStorage.getItem('edp_rascunhos')) || [];
 
-        function criarPasta(e) {
-            if (e) e.preventDefault(); // Trava o Vercel para não recarregar
-            
-            const nome = document.getElementById('nomePasta').value.trim();
-            const categoria = document.getElementById('categoriaPasta').value;
+            const btnCriarPasta = document.getElementById('btnCriarPasta');
+            const btnSubirMusica = document.getElementById('btnSubirMusica');
+            const btnPublicar = document.getElementById('btnPublicar');
 
-            if (!nome) {
-                alert('Por favor, digite o nome da pasta/projeto!');
-                return;
+            btnCriarPasta.addEventListener('click', function(e) {
+                e.preventDefault();
+                const nome = document.getElementById('nomePasta').value.trim();
+                if (!nome) return alert('Insira o nome da pasta!');
+
+                pastas.push({ id: Date.now(), nome: nome });
+                localStorage.setItem('edp_pastas', JSON.stringify(pastas));
+                
+                document.getElementById('nomePasta').value = '';
+                render();
+                alert('Pasta criada com sucesso!');
+            });
+
+            btnSubirMusica.addEventListener('click', function(e) {
+                e.preventDefault();
+                const titulo = document.getElementById('titulo').value.trim();
+                const artista = document.getElementById('artista').value.trim();
+                const pasta = document.getElementById('selectPasta').value;
+                const audio = document.getElementById('linkAudio').value.trim();
+                const capa = document.getElementById('linkCapa').value.trim();
+
+                if (!titulo || !artista || !audio || !capa) return alert('Preencha todos os campos!');
+
+                rascunhos.push({
+                    id: Date.now(), titulo: titulo, artista: artista, tipoProjeto: pasta, linkAudio: audio, linkCapa: capa
+                });
+
+                localStorage.setItem('edp_rascunhos', JSON.stringify(rascunhos));
+                
+                document.getElementById('titulo').value = '';
+                document.getElementById('artista').value = '';
+                document.getElementById('linkAudio').value = '';
+                document.getElementById('linkCapa').value = '';
+                
+                render();
+                alert('Música enviada para a Área de Monitorização!');
+            });
+
+            btnPublicar.addEventListener('click', function(e) {
+                e.preventDefault();
+                let publicados = JSON.parse(localStorage.getItem('edp_publicado')) || [];
+                localStorage.setItem('edp_publicado', JSON.stringify([...publicados, ...rascunhos]));
+                localStorage.setItem('edp_rascunhos', JSON.stringify([]));
+                rascunhos = [];
+                render();
+                alert('Site Atualizado com Sucesso para os Ouvintes!');
+            });
+
+            function render() {
+                const boxPastas = document.getElementById('lista-pastas');
+                boxPastas.innerHTML = '';
+                pastas.forEach(p => {
+                    boxPastas.innerHTML += `<div class="folder-badge">📁 ${p.nome}</div>`;
+                });
+
+                const selectPasta = document.getElementById('selectPasta');
+                selectPasta.innerHTML = '<option value="Música Solo">Música Solo (Sem Pasta)</option>';
+                pastas.forEach(p => {
+                    selectPasta.innerHTML += `<option value="${p.nome}">${p.nome}</option>`;
+                });
+
+                const boxRascunhos = document.getElementById('lista-rascunhos');
+                boxRascunhos.innerHTML = '';
+                rascunhos.forEach(r => {
+                    boxRascunhos.innerHTML += `
+                        <div class="preview-card">
+                            <div><strong>${r.titulo}</strong> - ${r.artista} (Pasta: ${r.tipoProjeto})</div>
+                            <audio src="${r.linkAudio}" controls style="height:28px;"></audio>
+                        </div>`;
+                });
             }
 
-            const novaPasta = { id: Date.now(), nome: nome, categoria: categoria };
-            pastas.push(novaPasta);
-            localStorage.setItem('edp_pastas', JSON.stringify(pastas));
-            
-            document.getElementById('nomePasta').value = '';
-            atualizarInterface();
-            alert(`Pasta "${nome}" criada com sucesso!`);
-        }
-
-        function subirMusica(e) {
-            if (e) e.preventDefault(); // Trava o Vercel para não recarregar
-
-            const titulo = document.getElementById('titulo').value.trim();
-            const artista = document.getElementById('artista').value.trim();
-            const pastaSelecionada = document.getElementById('selectPasta').value;
-            const linkAudio = document.getElementById('linkAudio').value.trim();
-            const linkCapa = document.getElementById('linkCapa').value.trim();
-            const linkYoutube = document.getElementById('linkYoutube').value.trim();
-            const biografia = document.getElementById('biografia').value.trim();
-
-            if (!titulo || !artista || !linkAudio || !linkCapa) {
-                alert('Erro: Os campos Título, Artista, Link do Áudio e Link da Capa são obrigatórios!');
-                return;
-            }
-
-            const novaMusica = {
-                id: Date.now(),
-                titulo: titulo,
-                artista: artista,
-                tipoProjeto: pastaSelecionada,
-                linkAudio: linkAudio,
-                linkCapa: linkCapa,
-                linkYoutube: linkYoutube,
-                biografia: biografia,
-                streams: 0, downloads: 0, gostos: 0
-            };
-
-            rascunhos.push(novaMusica);
-            localStorage.setItem('edp_rascunhos', JSON.stringify(rascunhos));
-
-            document.getElementById('titulo').value = '';
-            document.getElementById('artista').value = '';
-            document.getElementById('linkAudio').value = '';
-            document.getElementById('linkCapa').value = '';
-            document.getElementById('linkYoutube').value = '';
-            document.getElementById('biografia').value = '';
-
-            atualizarInterface();
-            alert('Música carregada na Área de Monitorização com sucesso!');
-        }
-
-        function eliminarRascunho(id) {
-            rascunhos = rascunhos.filter(item => item.id !== id);
-            localStorage.setItem('edp_rascunhos', JSON.stringify(rascunhos));
-            atualizarInterface();
-        }
-
-        function atualizarPaginaInicial(e) {
-            if (e) e.preventDefault();
-            if (rascunhos.length === 0) {
-                alert('Não existem novas músicas no rascunho para enviar.');
-                return;
-            }
-            publicados = [...publicados, ...rascunhos];
-            localStorage.setItem('edp_publicado', JSON.stringify(publicados));
-            rascunhos = [];
-            localStorage.setItem('edp_rascunhos', JSON.stringify(rascunhos));
-            atualizarInterface();
-            alert('🔥 SUCESSO! Conteúdo enviado para os ouvintes!');
-        }
-
-        function atualizarInterface() {
-            document.getElementById('stat-pastas').innerText = pastas.length;
-            document.getElementById('stat-musicas').innerText = rascunhos.length;
+            render();
+        });
+    </script>
+</body>
+</html>
