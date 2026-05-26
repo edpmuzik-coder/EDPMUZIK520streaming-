@@ -37,7 +37,7 @@
         <h1>EDPMUZIK - Painel de Controle de Streaming</h1>
         <p>Gere os seus artistas, crie pastas de álbuns/EPs e monitorize antes de enviar para o público.</p>
 
-        <!-- 1. PAINEL DE MONITORIZAÇÃO E ESTATÍSTICAS -->
+        <!-- ESTATÍSTICAS -->
         <div class="box">
             <h2>Estatísticas Gerais (Painel de Controle)</h2>
             <div class="stats-grid">
@@ -61,7 +61,7 @@
         </div>
 
         <div class="grid-2">
-            <!-- 2. CRIAR PASTAS (PROJETOS) -->
+            <!-- CRIAR PASTAS -->
             <div class="box">
                 <h2>1. Criar Nova Pasta (Álbum / EP / Mixtape)</h2>
                 <input type="text" id="nomePasta" placeholder="Nome do Álbum, EP ou Projeto">
@@ -70,15 +70,14 @@
                     <option value="Músico Colaborador">Músico Colaborador</option>
                     <option value="Músico Independente">Músico Independente</option>
                 </select>
-                <button onclick="criarPasta()">📁 Criar Pasta de Projeto</button>
+                <!-- Botão com trava de segurança para o Vercel -->
+                <button type="button" onclick="criarPasta(event)">📁 Criar Pasta de Projeto</button>
 
                 <h3>Pastas Ativas:</h3>
-                <div id="lista-pastas" class="folder-list">
-                    <!-- Pastas dinâmicas entram aqui -->
-                </div>
+                <div id="lista-pastas" class="folder-list"></div>
             </div>
 
-            <!-- 3. SUBIR MÚSICAS PARA AS PASTAS -->
+            <!-- SUBIR MÚSICAS -->
             <div class="box">
                 <h2>2. Subir Música / Vídeo por Link</h2>
                 <input type="text" id="titulo" placeholder="Título da Música">
@@ -87,7 +86,6 @@
                 <label>Selecionar Pasta / Tipo de Projeto:</label>
                 <select id="selectPasta">
                     <option value="Música Solo">Música Solo (Sem Pasta)</option>
-                    <!-- Pastas criadas vão aparecer aqui automaticamente -->
                 </select>
 
                 <input type="text" id="linkAudio" placeholder="Link do Áudio MP3 (Archive.org)">
@@ -95,31 +93,30 @@
                 <input type="text" id="linkYoutube" placeholder="Link do Vídeo de Publicidade (YouTube) - Opcional">
                 <textarea id="biografia" placeholder="Biografia curta do músico..." rows="2"></textarea>
                 
-                <button onclick="subirMusica()">🎵 Carregar para Monitorização</button>
+                <!-- Botão com trava de segurança para o Vercel -->
+                <button type="button" onclick="subirMusica(event)">🎵 Carregar para Monitorização</button>
             </div>
         </div>
 
-        <!-- 4. ÁREA DE PRÉ-VISUALIZAÇÃO (MONITORIZAÇÃO CRÍTICA) -->
+        <!-- ÁREA DE MONITORIZAÇÃO -->
         <div class="box">
             <h2>Área de Teste e Monitorização (Ouvir e Assistir Antes de Publicar)</h2>
-            <p style="color: #aaa; font-size: 0.9em;">Tudo o que carregar aparece aqui primeiro. Teste os links antes de enviar para a página principal.</p>
-            <div id="lista-rascunhos">
-                <p style="color: #666;">Nenhum ficheiro em monitorização.</p>
-            </div>
+            <div id="lista-rascunhos"></div>
         </div>
 
-        <!-- 5. BOTÃO CRÍTICO DE ATUALIZAÇÃO -->
-        <button class="update-btn" onclick="atualizarPaginaInicial()">🔄 ATUALIZAR PARA A PÁGINA INICIAL (ENVIAR PARA OS OUVINTES)</button>
+        <!-- BOTÃO DE ATUALIZAÇÃO -->
+        <button type="button" class="update-btn" onclick="atualizarPaginaInicial(event)">🔄 ATUALIZAR PARA A PÁGINA INICIAL (ENVIAR PARA OS OUVINTES)</button>
     </div>
 
+    <!-- O JAVASCRIPT ENTRA AQUI, UNIDO AO HTML -->
     <script>
-        // Inicializar os dados salvos no navegador
         let pastas = JSON.parse(localStorage.getItem('edp_pastas')) || [];
         let rascunhos = JSON.parse(localStorage.getItem('edp_rascunhos')) || [];
         let publicados = JSON.parse(localStorage.getItem('edp_publicado')) || [];
 
-        // 1. Função para Criar Pastas
-        function criarPasta() {
+        function criarPasta(e) {
+            if (e) e.preventDefault(); // Trava o Vercel para não recarregar
+            
             const nome = document.getElementById('nomePasta').value.trim();
             const categoria = document.getElementById('categoriaPasta').value;
 
@@ -128,23 +125,18 @@
                 return;
             }
 
-            const novaPasta = {
-                id: Date.now(),
-                nome: nome,
-                categoria: categoria
-            };
-
+            const novaPasta = { id: Date.now(), nome: nome, categoria: categoria };
             pastas.push(novaPasta);
             localStorage.setItem('edp_pastas', JSON.stringify(pastas));
             
-            // Limpar campo e atualizar a interface
             document.getElementById('nomePasta').value = '';
             atualizarInterface();
-            alert(`Pasta "${nome}" criada com sucesso! Já pode associar músicas a ela.`);
+            alert(`Pasta "${nome}" criada com sucesso!`);
         }
 
-        // 2. Função para Subir Músicas para o Painel
-        function subirMusica() {
+        function subirMusica(e) {
+            if (e) e.preventDefault(); // Trava o Vercel para não recarregar
+
             const titulo = document.getElementById('titulo').value.trim();
             const artista = document.getElementById('artista').value.trim();
             const pastaSelecionada = document.getElementById('selectPasta').value;
@@ -162,20 +154,17 @@
                 id: Date.now(),
                 titulo: titulo,
                 artista: artista,
-                tipoProjeto: pastaSelecionada, // Associa à pasta ou define como Solo
+                tipoProjeto: pastaSelecionada,
                 linkAudio: linkAudio,
                 linkCapa: linkCapa,
                 linkYoutube: linkYoutube,
                 biografia: biografia,
-                streams: 0,
-                downloads: 0,
-                gostos: 0
+                streams: 0, downloads: 0, gostos: 0
             };
 
             rascunhos.push(novaMusica);
             localStorage.setItem('edp_rascunhos', JSON.stringify(rascunhos));
 
-            // Limpar formulário de música
             document.getElementById('titulo').value = '';
             document.getElementById('artista').value = '';
             document.getElementById('linkAudio').value = '';
@@ -184,16 +173,29 @@
             document.getElementById('biografia').value = '';
 
             atualizarInterface();
-            alert('Música carregada com sucesso na Área de Monitorização! Teste o áudio abaixo.');
+            alert('Música carregada na Área de Monitorização com sucesso!');
         }
 
-        // 3. Remover item do rascunho se estiver errado
         function eliminarRascunho(id) {
             rascunhos = rascunhos.filter(item => item.id !== id);
             localStorage.setItem('edp_rascunhos', JSON.stringify(rascunhos));
             atualizarInterface();
         }
 
-        // 4. Botão de Atualização de Segurança (Envia os rascunhos para a página pública)
-        function atualizarPaginaInicial() {
+        function atualizarPaginaInicial(e) {
+            if (e) e.preventDefault();
             if (rascunhos.length === 0) {
+                alert('Não existem novas músicas no rascunho para enviar.');
+                return;
+            }
+            publicados = [...publicados, ...rascunhos];
+            localStorage.setItem('edp_publicado', JSON.stringify(publicados));
+            rascunhos = [];
+            localStorage.setItem('edp_rascunhos', JSON.stringify(rascunhos));
+            atualizarInterface();
+            alert('🔥 SUCESSO! Conteúdo enviado para os ouvintes!');
+        }
+
+        function atualizarInterface() {
+            document.getElementById('stat-pastas').innerText = pastas.length;
+            document.getElementById('stat-musicas').innerText = rascunhos.length;
