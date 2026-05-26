@@ -35,6 +35,7 @@
         .card h3 { font-size: 14px; margin: 8px 0 2px 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .card p { font-size: 12px; color: var(--text-muted); margin: 0; }
         .tag { background: var(--orange); color: black; font-weight: bold; font-size: 10px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; display: inline-block; margin-top: 4px; }
+        .faixas-count { font-size: 11px; color: var(--orange); display: block; margin-top: 2px; font-weight: bold; }
 
         .footer-player { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: #222; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-sizing: border-box; z-index: 1000; display: none; }
         .player-info { display: flex; align-items: center; width: 25%; }
@@ -124,39 +125,34 @@
             const listaMusicas = document.getElementById("lista-musicas");
             let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
 
-            if (banco.length === 0) {
-                listaMusicas.innerHTML = "<p style='color:#666; padding:20px;'>Nenhum lançamento no feed. Vá a /admin.html para subir!</p>";
+            let aprovados = banco.filter(item => item.aprovado === true);
+
+            if (aprovados.length === 0) {
+                listaMusicas.innerHTML = "<p style='color:#666; padding:20px;'>Nenhum lançamento público no ar ainda. Aguardando aprovação do administrador.</p>";
                 return;
             }
 
             listaMusicas.innerHTML = "";
             banco.forEach((item, index) => {
-                listaMusicas.innerHTML += `
-                    <div class="card" onclick="abrirPasta(${index})">
-                        <div class="cover-container">
-                            <img src="${item.capa_url}" onerror="this.src='https://unsplash.com'">
-                            <div class="hover-overlay">
-                                <button class="play-btn-icon" onclick="tocarMusica(event, '${item.titulo}', '${item.artista}', '${item.capa_url}', '${item.arquivo_url}')">▶</button>
+                if(item.aprovado) {
+                    const textoFaixas = item.tipo === "Música Solo" ? "" : `• ${item.faixas} Faixas`;
+                    listaMusicas.innerHTML += `
+                        <div class="card" onclick="abrirPasta(${index})">
+                            <div class="cover-container">
+                                <img src="${item.capa_url}" onerror="this.src='https://unsplash.com'">
+                                <div class="hover-overlay">
+                                    <button class="play-btn-icon" onclick="tocarMusica(event, '${item.titulo}', '${item.artista}', '${item.capa_url}', '${item.arquivo_url}')">▶</button>
+                                </div>
                             </div>
-                        </div>
-                        <h3>${item.titulo}</h3>
-                        <p>${item.artista}</p>
-                        <span class="tag">${item.tipo}</span>
-                    </div>`;
+                            <h3>${item.titulo}</h3>
+                            <p>${item.artista}</p>
+                            <span class="tag">${item.tipo}</span>
+                            <span class="faixas-count">${textoFaixas}</span>
+                        </div>`;
+                }
             });
         }
 
-        function tocarMusica(event, titulo, artista, capa, url) {
+        function tocarMusica(event, titulo, artist, capa, url) {
             event.stopPropagation();
             document.getElementById("global-player").style.display = "flex";
-            document.getElementById("p-capa").src = capa;
-            document.getElementById("p-titulo").innerText = titulo;
-            document.getElementById("p-artista").innerText = artista;
-            
-            const audio = document.getElementById("audio-elemento");
-            audio.src = url;
-            audio.play();
-        }
-
-        function abrirPasta(index) {
-            let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
