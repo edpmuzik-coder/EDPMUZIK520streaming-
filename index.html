@@ -5,68 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDPMUZIK520streaming — Discover</title>
     <style>
-        :root { --bg-main: #111111; --bg-nav: #222222; --orange: #ff5500; --text-main: #eeeeee; --text-muted: #999999; --border: #333333; }
-        body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 0; }
+        :root {
+            --bg-main: #111111;
+            --bg-nav: #222222;
+            --orange: #ff5500;
+            --text-main: #eeeeee;
+            --text-muted: #999999;
+            --border: #333333;
+        }
+        body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 0; padding-bottom: 90px; }
+        
         nav { background: var(--bg-nav); height: 50px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
         nav .logo { font-weight: bold; color: white; display: flex; align-items: center; gap: 8px; font-size: 16px; margin-right: 30px; }
         nav .logo span { color: var(--orange); }
         .container { max-width: 1240px; margin: 80px auto 40px auto; padding: 0 20px; }
         h2 { font-size: 22px; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
-        .card { background: var(--bg-nav); padding: 15px; border-radius: 6px; border: 1px solid var(--border); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; }
-        .card h3 { font-size: 15px; margin: 10px 0 2px 0; }
-        .card p { font-size: 12px; color: var(--text-muted); margin: 0 0 10px 0; }
-        .tag { background: var(--orange); color: black; font-weight: bold; font-size: 10px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; }
-        iframe { width: 100%; border: none; border-radius: 4px; background: #000; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
+        .card { background: transparent; cursor: pointer; position: relative; }
+        
+        .cover-container { width: 100%; aspect-ratio: 1/1; background: #222; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; position: relative; }
+        .cover-container img { width: 100%; height: 100%; object-fit: cover; transition: filter 0.3s; }
+        .hover-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .card:hover .hover-overlay { opacity: 1; }
+        .card:hover .cover-container img { filter: blur(1px); }
+        
+        .play-btn-icon { background: var(--orange); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        
+        .card h3 { font-size: 14px; margin: 8px 0 2px 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card p { font-size: 12px; color: var(--text-muted); margin: 0; }
+        .tag { background: var(--orange); color: black; font-weight: bold; font-size: 10px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; display: inline-block; margin-top: 4px; }
+
+        .footer-player { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: #222; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-sizing: border-box; z-index: 1000; display: none; }
+        .player-info { display: flex; align-items: center; width: 25%; }
+        .player-info img { width: 45px; height: 45px; object-fit: cover; border-radius: 3px; margin-right: 12px; border: 1px solid var(--border); }
+        .player-info div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .player-info h4 { margin: 0; font-size: 14px; color: white; }
+        .player-info p { margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted); }
+        .player-controls { width: 50%; display: flex; flex-direction: column; align-items: center; }
+        audio { width: 100%; height: 32px; outline: none; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: flex; align-items: center; justify-content: center; display: none; }
+        .modal-content { background: #1e1e1e; width: 90%; max-width: 700px; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; max-height: 85vh; }
+        .modal-header { background: #282828; padding: 20px; display: flex; gap: 20px; border-bottom: 1px solid var(--border); position: relative; }
+        .modal-header img { width: 120px; height: 120px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; color: var(--text-muted); cursor: pointer; border: none; background: transparent; }
+        .modal-close:hover { color: white; }
+        .action-bar { display: flex; gap: 10px; padding: 15px 20px; background: #1a1a1a; border-bottom: 1px solid var(--border); }
+        .btn-action { background: #333; color: white; border: 1px solid var(--border); padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-action:hover { background: #444; border-color: var(--orange); }
+        .btn-download { background: var(--orange); color: white; border: none; }
+        .btn-download:hover { background: #e04b00; }
+        .modal-body { padding: 20px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .comment-box input { width: 100%; padding: 10px; background: #111; border: 1px solid var(--border); color: white; border-radius: 4px; box-sizing: border-box; }
     </style>
 </head>
 <body>
-    <nav><div class="logo">☁️ <span>EDPMUZIK</span></div></nav>
-    <div class="container">
-        <h2>Músicas e Projetos</h2>
-        <div class="grid" id="lista-musicas"></div>
 
-        <h2>Vídeos e Publicidades</h2>
-        <div class="grid" id="lista-videos"></div>
+    <nav>
+        <div class="logo">☁️ <span>EDPMUZIK</span></div>
+    </nav>
+
+    <div class="container">
+        <h2>Curated by EDPMUZIK</h2>
+        <div class="grid" id="lista-musicas"></div>
     </div>
+
+    <div class="footer-player" id="global-player">
+        <div class="player-info">
+            <img id="p-capa" src="" alt="Capa">
+            <div>
+                <h4 id="p-titulo">Nome do Som</h4>
+                <p id="p-artista">Artista</p>
+            </div>
+        </div>
+        <div class="player-controls">
+            <audio id="audio-elemento" controls autoplay></audio>
+        </div>
+        <div style="width: 25%;"></div>
+    </div>
+
+    <div class="modal" id="music-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="fecharPasta()">×</button>
+            <div class="modal-header">
+                <img id="m-capa" src="" alt="Capa">
+                <div>
+                    <span class="tag" id="m-tipo">Single</span>
+                    <h2 id="m-titulo" style="border:none; margin:10px 0 5px 0; padding:0; font-size:26px;">Título</h2>
+                    <p id="m-artista" style="color:var(--text-muted); margin:0;">Artista</p>
+                </div>
+            </div>
+            <div class="action-bar">
+                <a id="btn-down-link" href="#" target="_blank" class="btn-action btn-download">⬇️ Download MP3</a>
+                <button class="btn-action" onclick="alert('Link copiado!')">🔗 Partilhar</button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <h4 style="margin-top:0; color:var(--orange);">📄 Biografia / Descrição</h4>
+                    <p id="m-bio" style="font-size:13px; color:#ccc; line-height:1.5;">EDPMUZIK Apresenta este grande lançamento exclusivo.</p>
+                </div>
+                <div>
+                    <h4 style="margin-top:0; color:var(--orange);">📊 Estatísticas</h4>
+                    <p style="font-size:13px; margin:5px 0;">👁️ <span id="m-views">0</span> reproduções</p>
+                    <div class="comment-box" style="margin-top:15px;">
+                        <h4 style="color:var(--text-muted); font-size:13px; margin-bottom:5px;">💬 Comentários</h4>
+                        <input type="text" placeholder="Escreva um comentário...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", exibirConteudo);
 
         function exibirConteudo() {
             const listaMusicas = document.getElementById("lista-musicas");
-            const listaVideos = document.getElementById("lista-videos");
-            let banco = JSON.parse(localStorage.getItem("edp_edge_store") || "[]");
+            let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
+
+            if (banco.length === 0) {
+                listaMusicas.innerHTML = "<p style='color:#666; padding:20px;'>Nenhum lançamento no feed. Vá a /admin.html para subir!</p>";
+                return;
+            }
 
             listaMusicas.innerHTML = "";
-            listaVideos.innerHTML = "";
-
-            let temMusica = false, temVideo = false;
-
-            banco.forEach(item => {
-                if (item.tipo === "Publicidade") {
-                    temVideo = true;
-                    listaVideos.innerHTML += `
-                        <div class="card">
-                            <iframe src="https://google.com{item.arquivo_id}/preview" height="200" allow="autoplay"></iframe>
-                            <h3>${item.titulo}</h3>
-                            <p>${item.artista} • <span class="tag">${item.tipo}</span></p>
-                        </div>`;
-                } else {
-                    temMusica = true;
-                    listaMusicas.innerHTML += `
-                        <div class="card">
-                            <img src="https://google.com{item.capa_id}" onerror="this.src='https://unsplash.com'">
-                            <h3>${item.titulo}</h3>
-                            <p>${item.artista} • <span class="tag">${item.tipo}</span></p>
-                            <iframe src="https://google.com{item.arquivo_id}/preview" height="60"></iframe>
-                        </div>`;
-                }
+            banco.forEach((item, index) => {
+                listaMusicas.innerHTML += `
+                    <div class="card" onclick="abrirPasta(${index})">
+                        <div class="cover-container">
+                            <img src="${item.capa_url}" onerror="this.src='https://unsplash.com'">
+                            <div class="hover-overlay">
+                                <button class="play-btn-icon" onclick="tocarMusica(event, '${item.titulo}', '${item.artista}', '${item.capa_url}', '${item.arquivo_url}')">▶</button>
+                            </div>
+                        </div>
+                        <h3>${item.titulo}</h3>
+                        <p>${item.artista}</p>
+                        <span class="tag">${item.tipo}</span>
+                    </div>`;
             });
-
-            if (!temMusica) listaMusicas.innerHTML = "<p style='color:#666;'>Nenhuma música enviada.</p>";
-            if (!temVideo) listaVideos.innerHTML = "<p style='color:#666;'>Nenhum vídeo enviado.</p>";
         }
-    </script>
-</body>
-</html>
+
+        function tocarMusica(event, titulo, artista, capa, url) {
+            event.stopPropagation();
+            document.getElementById("global-player").style.display = "flex";
+            document.getElementById("p-capa").src = capa;
+            document.getElementById("p-titulo").innerText = titulo;
+            document.getElementById("p-artista").innerText = artista;
+            
+            const audio = document.getElementById("audio-elemento");
+            audio.src = url;
+            audio.play();
+        }
+
+        function abrirPasta(index) {
+            let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
