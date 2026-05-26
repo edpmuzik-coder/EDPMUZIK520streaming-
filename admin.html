@@ -8,7 +8,7 @@
         :root { --bg-main: #111111; --bg-nav: #222222; --orange: #ff5500; --text-main: #eeeeee; --border: #333333; }
         body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 20px; }
         .grid-admin { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; max-w: 1400px; margin: 0 auto; }
-        .box { background: var(--bg-nav); border: 1px solid var(--border); padding: 20px; border-radius: 8px; box-sizing: border-box; }
+        .box { background: var(--bg-nav); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
         h2 { color: var(--orange); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 18px; }
         input, select, button, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-main); color: white; box-sizing: border-box; font-size: 14px; }
         button { background: var(--orange); border: none; font-weight: bold; cursor: pointer; color: white; }
@@ -16,92 +16,72 @@
         .stat-card { background: var(--bg-main); padding: 15px; border-radius: 4px; border: 1px solid var(--border); flex: 1; text-align: center; }
         .stat-card h3 { margin: 0; font-size: 24px; color: var(--orange); }
         .stat-card p { margin: 5px 0 0 0; font-size: 12px; color: #999; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .tab-btn { background: #333; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; border: none; color: white; width: auto; }
-        .tab-btn.active { background: var(--orange); color: black; font-weight: bold; }
         .item-lista { background: var(--bg-main); padding: 12px; margin-bottom: 10px; border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .item-lista img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px; }
+        .item-lista img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px; border: 1px solid var(--border); }
         .btn-apagar { background: #d32f2f; width: auto; padding: 6px 12px; font-size: 12px; margin: 0; }
-        .tag-tipo { background: #444; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
     </style>
 </head>
 <body>
 
-    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ PAINEL ADMINISTRATIVO GERAL EDPMUZIK</h1>
+    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ CONTROLADOR DE PASTAS & SOUNDCLOUD CLONE</h1>
 
     <div class="grid-admin">
-        <div class="space-y-4">
-            <!-- Form de Upload Público -->
+        <div>
             <div class="box">
-                <h2>🚀 Publicar Novo Conteúdo</h2>
+                <h2>📁 Criar Pastas de Artistas / Colaboradores</h2>
+                <form id="form-artista">
+                    <input type="text" id="nome_artista" placeholder="Nome do Artista / Produtor" required>
+                    <select id="categoria_artista">
+                        <option value="Produtora">Artistas da Produtora</option>
+                        <option value="Solo">Músicos a Solo</option>
+                        <option value="Colaborador">Músicos Colaboradores</option>
+                        <option value="Produtor">Produtores (Beats)</option>
+                    </select>
+                    <textarea id="bio_artista" placeholder="Biografia e informações do artista..." rows="3" required></textarea>
+                    <button type="submit" style="background:#444;">Criar Pasta Virtual 📁</button>
+                </form>
+            </div>
+
+            <div class="box" style="margin-top:20px;">
+                <h2>🚀 Publicar no Site</h2>
                 <form id="form-upload">
                     <input type="text" id="titulo" placeholder="Título (Música, Álbum, EP, Mixtape)" required>
                     
-                    <select id="artista_venculo" required>
-                        <option value="EDPMUZIK">EDPMUZIK (Principal)</option>
-                    </select>
+                    <label style="font-size:12px; color:#aaa;">Vincular à Pasta do Artista:</label>
+                    <select id="artista_venculo" required></select>
 
                     <select id="tipo_projeto">
                         <option value="Música Solo">Música Solo</option>
                         <option value="EP">Projeto: EP</option>
                         <option value="Mixtape">Projeto: Mixtape</option>
                         <option value="Álbum">Projeto: Álbum</option>
-                        <option value="Publicidade">Vídeo / Publicidade</option>
                     </select>
                     <input type="url" id="link_capa" placeholder="Link Direto da Capa (do Postimages)" required>
-                    <input type="url" id="link_arquivo" placeholder="Link da Música (Archive.org) ou Vídeo (YouTube)" required>
-                    <button type="submit">Publicar no Site Agora 🚀</button>
-                </form>
-            </div>
-
-            <!-- Form de Criar Pastas de Artistas -->
-            <div class="box" style="margin-top:20px;">
-                <h2>📁 Criar Pasta de Artista / Colaborador</h2>
-                <form id="form-artista">
-                    <input type="text" id="nome_artista" placeholder="Nome do Artista / Produtor" required>
-                    <select id="categoria_artista">
-                        <option value="Produtora">Artistas da Minha Produtora</option>
-                        <option value="Solo">Músicos a Solo</option>
-                        <option value="Colaborador">Músicos Colaboradores</option>
-                        <option value="Produtor">Produtores / Beats</option>
-                    </select>
-                    <textarea id="bio_artista" placeholder="Biografia curta do artista..." rows="2"></textarea>
-                    <button type="submit" style="background:#444;">Criar Pasta Virtual 📁</button>
+                    <input type="url" id="link_arquivo" placeholder="Link Direto da Música (do Archive.org)" required>
+                    <button type="submit">Subir Música Agora 🚀</button>
                 </form>
             </div>
         </div>
 
-        <!-- Painel de Gerenciamento -->
         <div class="box">
-            <h2>📊 Controle e Estatísticas (Estilo SoundCloud)</h2>
+            <h2>📊 Controle Geral EDPMUZIK</h2>
             <div class="stats-box">
-                <div class="stat-card"><h3>1,842</h3><p>Visualizações do Site</p></div>
-                <div class="stat-card"><h3 id="stat-projetos">0</h3><p>Conteúdos Online</p></div>
-                <div class="stat-card"><h3 id="stat-artistas">0</h3><p>Pastas / Artistas</p></div>
+                <div class="stat-card"><h3>2,941</h3><p>Visualizações do Site</p></div>
+                <div class="stat-card"><h3 id="stat-projetos">0</h3><p>Músicas Online</p></div>
+                <div class="stat-card"><h3 id="stat-artistas">0</h3><p>Pastas Criadas</p></div>
             </div>
 
-            <h2>📁 Gerenciar Pastas Criadas</h2>
-            <div class="tabs">
-                <button class="tab-btn active" onclick="mudarAba('todos')">Todos os Projetos</button>
-                <button class="tab-btn" onclick="mudarAba('Produtora')">Produtora</button>
-                <button class="tab-btn" onclick="mudarAba('Solo')">Músicos Solo</button>
-                <button class="tab-btn" onclick="mudarAba('Colaborador')">Colaboradores</button>
-                <button class="tab-btn" onclick="mudarAba('Produtor')">Produtores</button>
-            </div>
-
+            <h2>📁 Todas as Músicas no Ar</h2>
             <div id="lista-gerenciador"></div>
         </div>
     </div>
 
     <script>
-        let abaAtiva = 'todos';
-
         document.addEventListener("DOMContentLoaded", () => {
             atualizarSelecaoArtistas();
             exibirItensGerenciador();
         });
 
-        // Criar Artistas/Pastas
         document.getElementById("form-artista").addEventListener("submit", function(e) {
             e.preventDefault();
             const nome = document.getElementById("nome_artista").value;
@@ -120,35 +100,23 @@
         function atualizarSelecaoArtistas() {
             const select = document.getElementById("artista_venculo");
             let artistas = JSON.parse(localStorage.getItem("edp_artistas_v3") || "[]");
-            select.innerHTML = '<option value="EDPMUZIK" data-cat="todos">EDPMUZIK (Principal)</option>';
+            select.innerHTML = '<option value="EDPMUZIK">EDPMUZIK (Principal)</option>';
             artistas.forEach(art => {
-                select.innerHTML += `<option value="${art.nome}" data-cat="${art.categoria}">${art.nome} (${art.categoria})</option>`;
+                select.innerHTML += `<option value="${art.nome}">${art.nome} (${art.categoria})</option>`;
             });
         }
 
-        // Fazer Upload
         document.getElementById("form-upload").addEventListener("submit", function(e) {
             e.preventDefault();
-            const selectArtista = document.getElementById("artista_venculo");
-            const nomeArt = selectArtista.value;
-            const catArt = selectArtista.options[selectArtista.selectedIndex].getAttribute("data-cat");
-
-            // Limpa link do youtube se necessário
-            let arquivoUrl = document.getElementById("link_arquivo").value;
-            if(arquivoUrl.includes("://youtube.com")) {
-                arquivoUrl = arquivoUrl.replace("watch?v=", "embed/");
-            } else if(arquivoUrl.includes("youtu.be/")) {
-                arquivoUrl = arquivoUrl.replace("youtu.be/", "://youtube.com");
-            }
+            const nomeArt = document.getElementById("artista_venculo").value;
 
             const novoItem = {
                 id: Date.now().toString(),
                 titulo: document.getElementById("titulo").value,
                 artista: nomeArt,
-                categoria: catArt,
                 tipo: document.getElementById("tipo_projeto").value,
                 capa_url: document.getElementById("link_capa").value,
-                arquivo_url: arquivoUrl
+                arquivo_url: document.getElementById("link_arquivo").value
             };
 
             let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
@@ -168,14 +136,34 @@
             document.getElementById("stat-artistas").innerText = artistas.length;
             lista.innerHTML = "";
 
-            let filtrados = abaAtiva === 'todos' ? banco : banco.filter(i => i.categoria === abaAtiva);
-
-            if (filtrados.length === 0) {
-                lista.innerHTML = "<p style='color:#666; text-align:center; padding:20px;'>Nenhum item nesta pasta virtual.</p>";
+            if (banco.length === 0) {
+                lista.innerHTML = "<p style='color:#666; text-align:center;'>Nenhum projeto postado.</p>";
                 return;
             }
 
-            filtrados.forEach(item => {
+            banco.forEach(item => {
                 lista.innerHTML += `
                     <div class="item-lista">
                         <div style="display:flex; align-items:center;">
+                            <img src="${item.capa_url}" onerror="this.src='https://unsplash.com'">
+                            <div>
+                                <strong style="color:white; display:block;">${item.titulo}</strong>
+                                <span style="font-size:12px; color:#aaa;">${item.artista} [${item.tipo}]</span>
+                            </div>
+                        </div>
+                        <button class="btn-apagar" onclick="apagarItem('${item.id}')">Apagar ❌</button>
+                    </div>`;
+            });
+        }
+
+        function apagarItem(id) {
+            if (confirm("Remover do site?")) {
+                let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
+                banco = banco.filter(i => i.id !== id);
+                localStorage.setItem("edp_banco_v3", JSON.stringify(banco));
+                exibirItensGerenciador();
+            }
+        }
+    </script>
+</body>
+</html>
