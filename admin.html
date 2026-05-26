@@ -35,7 +35,7 @@
 
     <div class="container">
         <h1>EDPMUZIK - Painel de Controle Administrativo</h1>
-        <p style="color: #aaa; margin-bottom: 25px;">Gerenciamento integrado à API Vercel.</p>
+        <p style="color: #aaa; margin-bottom: 25px;">Gerenciamento integrado à API Vercel sem recarregamento de página.</p>
 
         <!-- ESTATÍSTICAS -->
         <div class="box">
@@ -49,7 +49,7 @@
         </div>
 
         <div class="grid-2">
-            <!-- SEÇÃO DE PASTAS -->
+            <!-- SEÇÃO DE PASTAS (SEM TAG FORM) -->
             <div class="box">
                 <h2>1. Criar Nova Pasta (Álbum / EP)</h2>
                 <input type="text" id="nomePasta" placeholder="Nome do Álbum, EP ou Projeto">
@@ -64,7 +64,7 @@
                 <div id="lista-pastas" class="folder-list"></div>
             </div>
 
-            <!-- SEÇÃO DE SUBIR CONTEÚDO -->
+            <!-- SEÇÃO DE SUBIR CONTEÚDO (SEM TAG FORM) -->
             <div class="box">
                 <h2>2. Subir Música / Vídeo por Link</h2>
                 <input type="text" id="titulo" placeholder="Título da Música">
@@ -95,48 +95,54 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Definição da rota correta da sua API Vercel
+            const API_URL = '/api/store';
+
             let pastasLocal = [];
             let musicasRascunhoLocal = [];
             let publicadasOnline = [];
 
-            // Puxar dados iniciais da sua API store.js
             async function carregarDadosDaAPI() {
                 try {
-                    const resBanco = await fetch('/api/store?acao=get_banco');
+                    const resBanco = await fetch(`${API_URL}?acao=get_banco`);
                     publicadasOnline = await resBanco.json() || [];
 
-                    const resArtistas = await fetch('/api/store?acao=get_artistas');
+                    const resArtistas = await fetch(`${API_URL}?acao=get_artistas`);
                     pastasLocal = await resArtistas.json() || [];
                 } catch (e) {
-                    console.log("Erro ao conectar com api/store.js, usando caches locais.");
+                    console.error("Erro na leitura da API:", e);
                 }
                 atualizarInterface();
             }
 
-            // Ação 1: Criar pasta via API
             document.getElementById('btnCriarPasta').addEventListener('click', async function(e) {
                 e.preventDefault();
+                e.stopPropagation(); // Bloqueia o navegador de resetar a página
+                
                 const nome = document.getElementById('nomePasta').value.trim();
                 const categoria = document.getElementById('categoriaPasta').value;
                 if (!nome) return alert('Por favor, insira o nome da pasta!');
 
                 const novaPasta = { id: Date.now(), nome: nome, categoria: categoria };
                 
-                // Envia para o seu store.js (acao: 'artistas')
-                await fetch('/api/store', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ acao: 'artistas', dados: novaPasta })
-                });
-
-                document.getElementById('nomePasta').value = '';
-                await carregarDadosDaAPI();
-                alert(`Pasta "${nome}" criada com sucesso no servidor!`);
+                try {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ acao: 'artistas', dados: novaPasta })
+                    });
+                    document.getElementById('nomePasta').value = '';
+                    await carregarDadosDaAPI();
+                    alert(`Pasta "${nome}" criada com sucesso no servidor!`);
+                } catch(err) {
+                    alert('Erro ao salvar na API.');
+                }
             });
 
-            // Ação 2: Adicionar à monitorização local temporária
             document.getElementById('btnSubirMusica').addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation(); // Bloqueia o navegador de resetar a página
+                
                 const titulo = document.getElementById('titulo').value.trim();
                 const artista = document.getElementById('artista').value.trim();
                 const pasta = document.getElementById('selectPasta').value;
@@ -161,17 +167,16 @@
                 document.getElementById('biografia').value = '';
 
                 atualizarInterface();
-                alert('Música adicionada à monitorização!');
+                alert('Música adicionada à área de teste abaixo!');
             });
 
-            // Ação 3: Enviar rascunhos para a API pública definitiva
             document.getElementById('btnPublicar').addEventListener('click', async function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+                
                 if (musicasRascunhoLocal.length === 0) return alert('Nenhuma música na área de teste.');
 
-                // Agrega ao banco existente através da chamada 'salvar_tudo_banco' do seu store.js
                 const novoBancoCompleto = [...musicasRascunhoLocal, ...publicadasOnline];
 
-                await fetch('/api/store', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                try {
+                    await fetch(API_URL, {
