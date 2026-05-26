@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Geral de Controlo — EDPMUZIK</title>
+    <title>Painel de Controlo Avançado — EDPMUZIK</title>
     <style>
         :root { --bg-main: #111111; --bg-nav: #222222; --orange: #ff5500; --text-main: #eeeeee; --border: #333333; }
         body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 20px; }
@@ -16,19 +16,26 @@
         .stat-card { background: var(--bg-main); padding: 15px; border-radius: 4px; border: 1px solid var(--border); flex: 1; text-align: center; }
         .stat-card h3 { margin: 0; font-size: 24px; color: var(--orange); }
         .stat-card p { margin: 5px 0 0 0; font-size: 12px; color: #999; }
-        .item-lista { background: var(--bg-main); padding: 12px; margin-bottom: 10px; border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .item-lista img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px; border: 1px solid var(--border); }
+        .item-lista { background: var(--bg-main); padding: 15px; margin-bottom: 15px; border-radius: 4px; border: 1px solid var(--border); }
+        .item-topo { display: flex; align-items: center; justify-content: space-between; }
+        .item-lista img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 12px; border: 1px solid var(--border); }
         .btn-apagar { background: #d32f2f; width: auto; padding: 6px 12px; font-size: 12px; margin: 0; }
+        .btn-aprovar { background: #2e7d32; width: auto; padding: 6px 12px; font-size: 12px; margin: 0 10px 0 0; }
+        .tag-status { font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
+        .status-pendente { background: #f57c00; color: white; }
+        .status-aprovado { background: #2e7d32; color: white; }
+        iframe { width: 100%; border: none; height: 60px; margin-top: 10px; background: #000; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ CONTROLADOR DE PASTAS & SOUNDCLOUD CLONE</h1>
+    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ CONTROLADOR DE PASTAS & SISTEMA DE APROVAÇÃO EDPMUZIK</h1>
 
     <div class="grid-admin">
         <div>
+            <!-- Form de Criar Pastas de Artistas -->
             <div class="box">
-                <h2>📁 Criar Pastas de Artistas / Colaboradores</h2>
+                <h2>📁 Criar Pastas de Artistas</h2>
                 <form id="form-artista">
                     <input type="text" id="nome_artista" placeholder="Nome do Artista / Produtor" required>
                     <select id="categoria_artista">
@@ -37,41 +44,48 @@
                         <option value="Colaborador">Músicos Colaboradores</option>
                         <option value="Produtor">Produtores (Beats)</option>
                     </select>
-                    <textarea id="bio_artista" placeholder="Biografia e informações do artista..." rows="3" required></textarea>
+                    <textarea id="bio_artista" placeholder="Biografia do artista..." rows="2" required></textarea>
                     <button type="submit" style="background:#444;">Criar Pasta Virtual 📁</button>
                 </form>
             </div>
 
+            <!-- Form de Publicar no Site -->
             <div class="box" style="margin-top:20px;">
-                <h2>🚀 Publicar no Site</h2>
+                <h2>🚀 Publicar Novo Conteúdo</h2>
                 <form id="form-upload">
-                    <input type="text" id="titulo" placeholder="Título (Música, Álbum, EP, Mixtape)" required>
+                    <input type="text" id="titulo" placeholder="Título do Lançamento" required>
                     
                     <label style="font-size:12px; color:#aaa;">Vincular à Pasta do Artista:</label>
                     <select id="artista_venculo" required></select>
 
-                    <select id="tipo_projeto">
-                        <option value="Música Solo">Música Solo</option>
+                    <select id="tipo_projeto" onchange="verificarTipo()">
+                        <option value="Música Solo">Música Solo / Single</option>
                         <option value="EP">Projeto: EP</option>
                         <option value="Mixtape">Projeto: Mixtape</option>
                         <option value="Álbum">Projeto: Álbum</option>
                     </select>
+
+                    <!-- Campo de Faixas que pediu -->
+                    <div id="campo-faixas" style="display:none;">
+                        <input type="number" id="num_faixas" placeholder="Número de Faixas / Músicas do Projeto" min="1" value="1">
+                    </div>
+
                     <input type="url" id="link_capa" placeholder="Link Direto da Capa (do Postimages)" required>
-                    <input type="url" id="link_arquivo" placeholder="Link Direto da Música (do Archive.org)" required>
-                    <button type="submit">Subir Música Agora 🚀</button>
+                    <input type="url" id="link_arquivo" placeholder="Link da Música no Archive.org (Link Principal)" required>
+                    <button type="submit">Enviar para Análise 🚀</button>
                 </form>
             </div>
         </div>
 
         <div class="box">
-            <h2>📊 Controle Geral EDPMUZIK</h2>
+            <h2>📊 Controle Geral e Moderação</h2>
             <div class="stats-box">
-                <div class="stat-card"><h3>2,941</h3><p>Visualizações do Site</p></div>
-                <div class="stat-card"><h3 id="stat-projetos">0</h3><p>Músicas Online</p></div>
+                <div class="stat-card"><h3>2,941</h3><p>Visualizações</p></div>
+                <div class="stat-card"><h3 id="stat-projetos">0</h3><p>Músicas no Ar</p></div>
                 <div class="stat-card"><h3 id="stat-artistas">0</h3><p>Pastas Criadas</p></div>
             </div>
 
-            <h2>📁 Todas as Músicas no Ar</h2>
+            <h2>📁 Gerenciador de Lançamentos (Lista de Moderação)</h2>
             <div id="lista-gerenciador"></div>
         </div>
     </div>
@@ -81,6 +95,16 @@
             atualizarSelecaoArtistas();
             exibirItensGerenciador();
         });
+
+        function verificarTipo() {
+            const tipo = document.getElementById("tipo_projeto").value;
+            const campo = document.getElementById("campo-faixas");
+            if (tipo === "EP" || tipo === "Mixtape" || tipo === "Álbum") {
+                campo.style.display = "block";
+            } else {
+                campo.style.display = "none";
+            }
+        }
 
         document.getElementById("form-artista").addEventListener("submit", function(e) {
             e.preventDefault();
@@ -109,14 +133,18 @@
         document.getElementById("form-upload").addEventListener("submit", function(e) {
             e.preventDefault();
             const nomeArt = document.getElementById("artista_venculo").value;
+            const tipo = document.getElementById("tipo_projeto").value;
+            const faixas = (tipo === "Música Solo") ? "1" : document.getElementById("num_faixas").value;
 
             const novoItem = {
                 id: Date.now().toString(),
                 titulo: document.getElementById("titulo").value,
                 artista: nomeArt,
-                tipo: document.getElementById("tipo_projeto").value,
+                tipo: tipo,
+                faixas: faixas,
                 capa_url: document.getElementById("link_capa").value,
-                arquivo_url: document.getElementById("link_arquivo").value
+                arquivo_url: document.getElementById("link_arquivo").value,
+                aprovado: false // Começa como FALSO (Pendente) para aprovar depois
             };
 
             let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
@@ -124,6 +152,7 @@
             localStorage.setItem("edp_banco_v3", JSON.stringify(banco));
 
             this.reset();
+            verificarTipo();
             exibirItensGerenciador();
         });
 
@@ -132,7 +161,9 @@
             let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
             let artistas = JSON.parse(localStorage.getItem("edp_artistas_v3") || "[]");
 
-            document.getElementById("stat-projetos").innerText = banco.length;
+            // Conta apenas os que estão aprovados para a estatística
+            const aprovadosCount = banco.filter(i => i.aprovado === true).length;
+            document.getElementById("stat-projetos").innerText = aprovadosCount;
             document.getElementById("stat-artistas").innerText = artistas.length;
             lista.innerHTML = "";
 
@@ -142,28 +173,12 @@
             }
 
             banco.forEach(item => {
+                const statusTexto = item.aprovado ? "No Ar 🟢" : "Pendente 🟠";
+                const statusClasse = item.aprovado ? "status-aprovado" : "status-pendente";
+                
                 lista.innerHTML += `
                     <div class="item-lista">
-                        <div style="display:flex; align-items:center;">
-                            <img src="${item.capa_url}" onerror="this.src='https://unsplash.com'">
-                            <div>
-                                <strong style="color:white; display:block;">${item.titulo}</strong>
-                                <span style="font-size:12px; color:#aaa;">${item.artista} [${item.tipo}]</span>
-                            </div>
-                        </div>
-                        <button class="btn-apagar" onclick="apagarItem('${item.id}')">Apagar ❌</button>
-                    </div>`;
-            });
-        }
-
-        function apagarItem(id) {
-            if (confirm("Remover do site?")) {
-                let banco = JSON.parse(localStorage.getItem("edp_banco_v3") || "[]");
-                banco = banco.filter(i => i.id !== id);
-                localStorage.setItem("edp_banco_v3", JSON.stringify(banco));
-                exibirItensGerenciador();
-            }
-        }
-    </script>
-</body>
-</html>
+                        <div class="item-topo">
+                            <div style="display:flex; align-items:center;">
+                                <img src="${item.capa_url}">
+                                <div>
