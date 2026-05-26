@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controlo Geral — EDPMUZIK</title>
+    <title>Painel Geral — EDPMUZIK</title>
     <style>
         :root { --bg-main: #111111; --bg-nav: #222222; --orange: #ff5500; --text-main: #eeeeee; --border: #333333; }
         body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 20px; }
@@ -12,10 +12,6 @@
         h2 { color: var(--orange); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 18px; }
         input, select, button, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-main); color: white; box-sizing: border-box; font-size: 14px; }
         button { background: var(--orange); border: none; font-weight: bold; cursor: pointer; color: white; }
-        .stats-box { display: flex; gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: var(--bg-main); padding: 15px; border-radius: 4px; border: 1px solid var(--border); flex: 1; text-align: center; }
-        .stat-card h3 { margin: 0; font-size: 24px; color: var(--orange); }
-        .stat-card p { margin: 5px 0 0 0; font-size: 12px; color: #999; }
         .item-lista { background: var(--bg-main); padding: 15px; margin-bottom: 15px; border-radius: 4px; border: 1px solid var(--border); }
         .item-topo { display: flex; align-items: center; justify-content: space-between; }
         .item-lista img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 12px; border: 1px solid var(--border); }
@@ -28,67 +24,53 @@
     </style>
 </head>
 <body>
-
-    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ CONTROLADOR GERAL EDPMUZIK (PASTAS & PUBLICIDADE)</h1>
-
+    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ CONTROLADOR GERAL EDPMUZIK</h1>
     <div class="grid-admin">
         <div>
             <div class="box">
-                <h2>📁 Criar Pasta de Artista / Colaborador</h2>
+                <h2>📁 Criar Pasta de Artista</h2>
                 <form id="form-artista">
-                    <input type="text" id="nome_artista" placeholder="Nome do Artista, Produtor ou Empresa" required>
+                    <input type="text" id="nome_artista" placeholder="Nome do Artista ou Empresa" required>
                     <select id="categoria_artista">
                         <option value="Produtora">Artistas da Produtora</option>
                         <option value="Solo">Músicos a Solo</option>
                         <option value="Colaborador">Músicos Colaboradores</option>
                         <option value="Produtor">Produtores (Beats)</option>
-                        <option value="Anunciante">Anunciante (Publicidade)</option>
                     </select>
                     <textarea id="bio_artista" placeholder="Biografia do artista..." rows="2" required></textarea>
-                    <button type="submit" style="background:#444;">Criar / Registrar Pasta 📁</button>
+                    <button type="submit" style="background:#444;">Criar Pasta 📁</button>
                 </form>
             </div>
-
             <div class="box">
                 <h2>🚀 Publicar no Site (Música, Vídeo ou Banner)</h2>
                 <form id="form-upload">
                     <input type="text" id="titulo" placeholder="Título do Conteúdo" required>
-                    <label style="font-size:12px; color:#aaa;">Escolher uma Pasta Já Existente:</label>
+                    <label style="font-size:12px; color:#aaa;">Pasta do Artista:</label>
                     <select id="artista_venculo" class="seletor-dinamico" required>
                         <option value="EDPMUZIK">EDPMUZIK (Pasta Principal)</option>
                     </select>
-
                     <select id="tipo_projeto" onchange="verificarTipo()">
                         <option value="Música Solo">Música Solo / Single</option>
                         <option value="EP">Projeto: EP</option>
                         <option value="Mixtape">Projeto: Mixtape</option>
                         <option value="Álbum">Projeto: Álbum</option>
                         <option value="Vídeo Clipe">Vídeo Clipe Musical</option>
-                        <option value="Banner Publicidade">Banner de Publicidade (Foto)</option>
-                        <option value="Vídeo Publicidade">Vídeo de Publicidade</option>
+                        <option value="Banner Publicidade">Banner de Publicidade</option>
                     </select>
                     <div id="campo-faixas" style="display:none;">
-                        <input type="number" id="num_faixas" placeholder="Número de Faixas do Projeto" min="1" value="1">
+                        <input type="number" id="num_faixas" placeholder="Número de Faixas" min="1" value="1">
                     </div>
-                    <input type="url" id="link_capa" placeholder="Link da Capa/Banner (Postimages)" required>
+                    <input type="url" id="link_capa" placeholder="Link da Capa (Postimages)" required>
                     <input type="url" id="link_arquivo" placeholder="Link do MP3 (Archive) ou Vídeo (YouTube)" required>
                     <button type="submit">Enviar para Aprovação 🚀</button>
                 </form>
             </div>
         </div>
-
         <div class="box">
-            <h2>📊 Controle Geral e Moderação</h2>
-            <div class="stats-box">
-                <div class="stat-card"><h3>3,412</h3><p>Visualizações</p></div>
-                <div class="stat-card"><h3 id="stat-projetos">0</h3><p>Conteúdos no Ar</p></div>
-                <div class="stat-card"><h3 id="stat-artistas">1</h3><p>Pastas Ativas</p></div>
-            </div>
-            <h2>📁 Gerenciador de Lançamentos do Site</h2>
+            <h2>📁 Gerenciador de Lançamentos</h2>
             <div id="lista-gerenciador"></div>
         </div>
     </div>
-
     <script>
         async function chamarAPI(acao, dados = {}) {
             try {
@@ -99,50 +81,37 @@
                 });
                 return await res.json();
             } catch (e) {
-                let local = JSON.parse(localStorage.getItem("edp_v6_" + acao) || "[]");
-                if (dados.id) { local.unshift(dados); localStorage.setItem("edp_v6_" + acao, JSON.stringify(local)); }
+                let local = JSON.parse(localStorage.getItem("edp_v7_" + acao) || "[]");
+                if (dados.id) { local.unshift(dados); localStorage.setItem("edp_v7_" + acao, JSON.stringify(local)); }
                 return local;
             }
         }
-
         document.addEventListener("DOMContentLoaded", async () => {
             await atualizarSelecaoArtistas();
             await exibirItensGerenciador();
         });
-
         function verificarTipo() {
             const tipo = document.getElementById("tipo_projeto").value;
-            const campo = document.getElementById("campo-faixas");
-            campo.style.display = (tipo === "EP" || tipo === "Mixtape" || tipo === "Álbum") ? "block" : "none";
+            document.getElementById("campo-faixas").style.display = (tipo === "EP" || tipo === "Mixtape" || tipo === "Álbum") ? "block" : "none";
         }
-
         document.getElementById("form-artista").addEventListener("submit", async function(e) {
             e.preventDefault();
             const nome = document.getElementById("nome_artista").value.trim();
-            const categoria = document.getElementById("categoria_artista").value;
-            const bio = document.getElementById("bio_artista").value;
-
-            await chamarAPI('artistas', { id: Date.now().toString(), nome, categoria, bio });
-            alert("Pasta para '" + nome + "' registrada com sucesso!");
+            await chamarAPI('artistas', { id: Date.now().toString(), nome, categoria: document.getElementById("categoria_artista").value, bio: document.getElementById("bio_artista").value });
+            alert("Pasta registrada!");
             this.reset();
             await atualizarSelecaoArtistas();
         });
-
         async function atualizarSelecaoArtistas() {
             const select = document.getElementById("artista_venculo");
             let artistas = await chamarAPI('get_artistas');
             select.innerHTML = '<option value="EDPMUZIK">EDPMUZIK (Pasta Principal)</option>';
-            artistas.forEach(art => {
-                select.innerHTML += `<option value="${art.nome}">${art.nome} (${art.categoria})</option>`;
-            });
+            artistas.forEach(art => { select.innerHTML += `<option value="${art.nome}">${art.nome}</option>`; });
         }
-
         document.getElementById("form-upload").addEventListener("submit", async function(e) {
             e.preventDefault();
-            let arquivoUrl = document.getElementById("link_arquivo").value;
-            if(arquivoUrl.includes("://youtube.com")) arquivoUrl = arquivoUrl.replace("watch?v=", "embed/");
-            if(arquivoUrl.includes("youtu.be/")) arquivoUrl = arquivoUrl.replace("youtu.be/", "://youtube.com");
-
+            let url = document.getElementById("link_arquivo").value;
+            if(url.includes("watch?v=")) url = url.replace("watch?v=", "embed/");
             const novoItem = {
                 id: Date.now().toString(),
                 titulo: document.getElementById("titulo").value,
@@ -150,29 +119,47 @@
                 tipo: document.getElementById("tipo_projeto").value,
                 faixas: document.getElementById("num_faixas").value || "1",
                 capa_url: document.getElementById("link_capa").value,
-                arquivo_url: arquivoUrl,
+                arquivo_url: url,
                 aprovado: false
             };
-
             await chamarAPI('banco', novoItem);
-            alert("Conteúdo enviado para análise!");
+            alert("Enviado para análise!");
             this.reset();
-            verificarTipo();
             await exibirItensGerenciador();
         });
-
         async function exibirItensGerenciador() {
             const lista = document.getElementById("lista-gerenciador");
             let banco = await chamarAPI('get_banco');
-            let artistas = await chamarAPI('get_artistas');
-
-            document.getElementById("stat-projetos").innerText = banco.filter(i => i.aprovado).length;
-            document.getElementById("stat-artistas").innerText = artistas.length + 1;
             lista.innerHTML = "";
-
-            if (banco.length === 0) {
-                lista.innerHTML = "<p style='color:#666; text-align:center;'>Nenhum item pendente.</p>";
-                return;
-            }
-
+            if (banco.length === 0) { lista.innerHTML = "<p style='color:#666;'>Nenhum item pendente.</p>"; return; }
             banco.forEach(item => {
+                const statusTxt = item.aprovado ? "No Ar 🟢" : "Pendente 🟠";
+                const statusCls = item.aprovado ? "status-aprovado" : "status-pendente";
+                lista.innerHTML += `
+                    <div class="item-lista">
+                        <div class="item-topo">
+                            <div style="display:flex; align-items:center;">
+                                <img src="${item.capa_url}">
+                                <div>
+                                    <strong>${item.titulo}</strong>
+                                    <span style="display:block;font-size:12px;color:#aaa;">${item.artista} [${item.tipo}]</span>
+                                    <span class="tag-status ${statusCls}">${statusTxt}</span>
+                                </div>
+                            </div>
+                            <div>
+                                ${!item.aprovado ? `<button class="btn-aprovar" onclick="aprovarItem('${item.id}')">Aprovar 🟢</button>` : ''}
+                                <button class="btn-apagar" onclick="apagarItem('${item.id}')">Apagar ❌</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+        async function aprovarItem(id) {
+            let banco = await chamarAPI('get_banco');
+            const item = banco.find(i => i.id === id);
+            if (item) { 
+                item.aprovado = true; 
+                await fetch('/api/store', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'salvar_tudo_banco', dados: banco }) });
+                await exibirItensGerenciador(); 
+            }
+        }
