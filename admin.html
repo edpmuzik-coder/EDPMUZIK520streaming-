@@ -29,7 +29,7 @@
 </head>
 <body>
 
-    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ CONTROLADOR GERAL EDPMUZIK (PASTAS & PUBLICIDADE)</h1>
+    <h1 style="text-align:center; color:white; margin-bottom:30px;">☁️ CONTROLADOR GERAL EDPMUZIK</h1>
 
     <div class="grid-admin">
         <div>
@@ -53,8 +53,13 @@
                 <h2>🚀 Publicar no Site (Música, Vídeo ou Banner)</h2>
                 <form id="form-upload">
                     <input type="text" id="titulo" placeholder="Título do Conteúdo" required>
+                    
                     <label style="font-size:12px; color:#aaa;">Escolher uma Pasta Já Existente:</label>
-                    <select id="artista_venculo" class="seletor-dinamico" required></select>
+                    <select id="artista_venculo" class="seletor-dinamico" required>
+                        <!-- Forçado por padrão para evitar o erro de lista vazia -->
+                        <option value="EDPMUZIK">EDPMUZIK (Pasta Principal)</option>
+                    </select>
+
                     <select id="tipo_projeto" onchange="verificarTipo()">
                         <option value="Música Solo">Música Solo / Single</option>
                         <option value="EP">Projeto: EP</option>
@@ -64,9 +69,11 @@
                         <option value="Banner Publicidade">Banner de Publicidade (Foto)</option>
                         <option value="Vídeo Publicidade">Vídeo de Publicidade</option>
                     </select>
+
                     <div id="campo-faixas" style="display:none;">
                         <input type="number" id="num_faixas" placeholder="Número de Faixas do Projeto" min="1" value="1">
                     </div>
+
                     <input type="url" id="link_capa" placeholder="Link da Capa/Banner (Postimages)" required>
                     <input type="url" id="link_arquivo" placeholder="Link do MP3 (Archive) ou Vídeo (YouTube)" required>
                     <button type="submit">Enviar para Aprovação 🚀</button>
@@ -79,7 +86,7 @@
             <div class="stats-box">
                 <div class="stat-card"><h3>3,412</h3><p>Visualizações</p></div>
                 <div class="stat-card"><h3 id="stat-projetos">0</h3><p>Conteúdos no Ar</p></div>
-                <div class="stat-card"><h3 id="stat-artistas">0</h3><p>Pastas Ativas</p></div>
+                <div class="stat-card"><h3 id="stat-artistas">1</h3><p>Pastas Ativas</p></div>
             </div>
             <h2>📁 Gerenciador de Lançamentos do Site</h2>
             <div id="lista-gerenciador"></div>
@@ -87,26 +94,9 @@
     </div>
 
     <script>
-        // Sincronização direta com a API estável de armazenamento
-        async function chamarAPI(acao, dados = {}) {
-            try {
-                const res = await fetch('/api/store', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ acao, dados })
-                });
-                return await res.json();
-            } catch (e) {
-                // Fallback de contingência caso o deploy da API demore
-                let local = JSON.parse(localStorage.getItem("edp_" + acao) || "[]");
-                if(dados.id) { local.unshift(dados); localStorage.setItem("edp_" + acao, JSON.stringify(local)); }
-                return local;
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", async () => {
-            await atualizarSelecaoArtistas();
-            await exibirItensGerenciador();
+        document.addEventListener("DOMContentLoaded", () => {
+            atualizarSelecaoArtistas();
+            exibirItensGerenciador();
         });
 
         function verificarTipo() {
@@ -115,29 +105,37 @@
             campo.style.display = (tipo === "EP" || tipo === "Mixtape" || tipo === "Álbum") ? "block" : "none";
         }
 
-        document.getElementById("form-artista").addEventListener("submit", async function(e) {
+        document.getElementById("form-artista").addEventListener("submit", function(e) {
             e.preventDefault();
             const nome = document.getElementById("nome_artista").value.trim();
             const categoria = document.getElementById("categoria_artista").value;
             const bio = document.getElementById("bio_artista").value;
 
-            await chamarAPI('artistas', { id: Date.now().toString(), nome, categoria, bio });
+            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v6") || "[]");
+            artistas.push({ id: Date.now().toString(), nome, categoria, bio });
+            localStorage.setItem("edp_artistas_v6", JSON.stringify(artistas));
+
             alert("Pasta para '" + nome + "' registrada!");
             this.reset();
-            await atualizarSelecaoArtistas();
+            atualizarSelecaoArtistas();
         });
 
-        async function atualizarSelecaoArtistas() {
+        function atualizarSelecaoArtistas() {
             const select = document.getElementById("artista_venculo");
-            let artistas = await chamarAPI('get_artistas');
+            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v6") || "[]");
+            
             select.innerHTML = '<option value="EDPMUZIK">EDPMUZIK (Pasta Principal)</option>';
             artistas.forEach(art => {
                 select.innerHTML += `<option value="${art.nome}">${art.nome} (${art.categoria})</option>`;
             });
         }
 
-        document.getElementById("form-upload").addEventListener("submit", async function(e) {
+        document.getElementById("form-upload").addEventListener("submit", function(e) {
             e.preventDefault();
+            const nomeArt = document.getElementById("artista_venculo").value;
+            const tipo = document.getElementById("tipo_projeto").value;
+            const faixas = (tipo === "EP" || tipo === "Mixtape" || tipo === "Álbum") ? document.getElementById("num_faixas").value : "1";
+
             let arquivoUrl = document.getElementById("link_arquivo").value;
             if(arquivoUrl.includes("://youtube.com")) arquivoUrl = arquivoUrl.replace("watch?v=", "embed/");
             if(arquivoUrl.includes("youtu.be/")) arquivoUrl = arquivoUrl.replace("youtu.be/", "://youtube.com");
@@ -145,25 +143,28 @@
             const novoItem = {
                 id: Date.now().toString(),
                 titulo: document.getElementById("titulo").value,
-                artista: document.getElementById("artista_venculo").value,
-                tipo: document.getElementById("tipo_projeto").value,
-                faixas: document.getElementById("num_faixas").value || "1",
+                artista: nomeArt,
+                tipo: tipo,
+                faixas: faixas,
                 capa_url: document.getElementById("link_capa").value,
                 arquivo_url: arquivoUrl,
                 aprovado: false
             };
 
-            await chamarAPI('banco', novoItem);
-            alert("Submetido com sucesso!");
+            let banco = JSON.parse(localStorage.getItem("edp_banco_v6") || "[]");
+            banco.unshift(novoItem);
+            localStorage.setItem("edp_banco_v6", JSON.stringify(banco));
+
+            alert("Submetido! Aprove na lista ao lado.");
             this.reset();
             verificarTipo();
-            await exibirItensGerenciador();
+            exibirItensGerenciador();
         });
 
-        async function exibirItensGerenciador() {
+        function exibirItensGerenciador() {
             const lista = document.getElementById("lista-gerenciador");
-            let banco = await chamarAPI('get_banco');
-            let artistas = await chamarAPI('get_artistas');
+            let banco = JSON.parse(localStorage.getItem("edp_banco_v6") || "[]");
+            let artistas = JSON.parse(localStorage.getItem("edp_artistas_v6") || "[]");
 
             document.getElementById("stat-projetos").innerText = banco.filter(i => i.aprovado).length;
             document.getElementById("stat-artistas").innerText = artistas.length + 1;
@@ -174,3 +175,4 @@
                 return;
             }
 
+            banco.forEach(item => {
